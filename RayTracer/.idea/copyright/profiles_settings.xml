@@ -1,0 +1,7 @@
+<component name="CopyrightManager">
+  <settings default="raytracer">
+    <module2copyright>
+      <element module="All" copyright="raytracer" />
+    </module2copyright>
+  </settings>
+</component>
