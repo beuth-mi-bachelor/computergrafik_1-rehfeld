@@ -4,13 +4,12 @@
 
 package de.beuth.raytracer.geometry;
 
-import de.beuth.raytracer.color.Color;
-import de.beuth.raytracer.geometry.interfaces.ICylinder;
+import de.beuth.raytracer.material.Material;
 import de.beuth.raytracer.mathlibrary.Point3;
 import de.beuth.raytracer.mathlibrary.Ray;
 import de.beuth.raytracer.mathlibrary.Vector3;
 
-public class Cylinder extends Geometry implements ICylinder {
+public class Cylinder extends Geometry {
 
     /**
      * the start cap point of the cylinder
@@ -36,10 +35,10 @@ public class Cylinder extends Geometry implements ICylinder {
     /**
      * creates a new instance of geometry
      *
-     * @param color defines a base color for the geometry
+     * @param material defines a base material for the geometry
      */
-    public Cylinder(final Vector3 C, final Vector3 V, final double r, final double length, final Color color) {
-        super(color);
+    public Cylinder(final Vector3 C, final Vector3 V, final double r, final double length, final Material material) {
+        super(material);
         this.C = C;
         this.V = V;
         this.r = r;
@@ -82,8 +81,7 @@ public class Cylinder extends Geometry implements ICylinder {
                         Vector3 onAxis = findNearestPointOnLine(int2, C, V);
                         Vector3 normal = int2.sub(onAxis);
                         if ( normal.dot(ray.d) > 0.0 )
-                            //normal = normal.mul(-1.0);
-                        return new Hit( normal.dot(ray.d)*(-1.0), ray, this);//getNormal(int2));
+                        return new Hit( normal.dot(ray.d)*(-1.0), ray, this, normal.normalized().asNormal());//getNormal(int2));
                     }
                 }
             }
@@ -92,8 +90,7 @@ public class Cylinder extends Geometry implements ICylinder {
             Vector3 onAxis = findNearestPointOnLine(int1, C, V);
             Vector3 normal = int1.sub(onAxis);
             if ( normal.dot(ray.d) > 0.0 )
-                //normal = normal.mul(-1.0);
-            return new Hit(normal.dot(ray.d)*(-1.0), ray, this);//getNormal(int1));
+            return new Hit(normal.dot(ray.d)*(-1.0), ray, this, normal.normalized().asNormal());//getNormal(int1));
         }
         return null;
 
@@ -150,7 +147,42 @@ public class Cylinder extends Geometry implements ICylinder {
         return origin.add(direction.mul(size));
     }
 
+    @Override
+    public String toString() {
+        return "Cylinder{" +
+                "C=" + C +
+                ", V=" + V +
+                ", r=" + r +
+                ", length=" + length +
+                '}';
+    }
 
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
 
+        Cylinder cylinder = (Cylinder) o;
 
+        if (Double.compare(cylinder.length, length) != 0) return false;
+        if (Double.compare(cylinder.r, r) != 0) return false;
+        if (C != null ? !C.equals(cylinder.C) : cylinder.C != null) return false;
+        if (V != null ? !V.equals(cylinder.V) : cylinder.V != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        long temp;
+        result = 31 * result + (C != null ? C.hashCode() : 0);
+        result = 31 * result + (V != null ? V.hashCode() : 0);
+        temp = Double.doubleToLongBits(r);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(length);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        return result;
+    }
 }

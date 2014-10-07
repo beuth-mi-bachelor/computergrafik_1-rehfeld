@@ -4,6 +4,7 @@
 
 package de.beuth.raytracer.geometry;
 
+import de.beuth.raytracer.mathlibrary.Normal3;
 import de.beuth.raytracer.mathlibrary.Ray;
 
 /**
@@ -24,18 +25,26 @@ public class Hit {
     /**
      * the geometry hit with
      */
-    public final Geometry geo;
+    public Geometry geo;
+
+    /**
+     * normal of the hit point
+     */
+    public final Normal3 n;
 
     /**
      * displays a  hit between two objects
-     * @param t where do they hit
-     * @param r the ray hit with
+     *
+     * @param t   where do they hit
+     * @param r   the ray hit with
      * @param geo the geometry hit with
+     * @param n   normal of the hitpoint
      */
-    public Hit(final double t, final Ray r, final Geometry geo) {
+    public Hit(final double t, final Ray r, final Geometry geo, final Normal3 n) {
         this.t = t;
         this.r = r;
         this.geo = geo;
+        this.n = n;
     }
 
     @Override
@@ -44,6 +53,7 @@ public class Hit {
                 "t=" + t +
                 ", r=" + r +
                 ", geo=" + geo +
+                ", n=" + n +
                 '}';
     }
 
@@ -56,6 +66,7 @@ public class Hit {
 
         if (Double.compare(hit.t, t) != 0) return false;
         if (geo != null ? !geo.equals(hit.geo) : hit.geo != null) return false;
+        if (n != null ? !n.equals(hit.n) : hit.n != null) return false;
         if (r != null ? !r.equals(hit.r) : hit.r != null) return false;
 
         return true;
@@ -69,6 +80,7 @@ public class Hit {
         result = (int) (temp ^ (temp >>> 32));
         result = 31 * result + (r != null ? r.hashCode() : 0);
         result = 31 * result + (geo != null ? geo.hashCode() : 0);
+        result = 31 * result + (n != null ? n.hashCode() : 0);
         return result;
     }
 }

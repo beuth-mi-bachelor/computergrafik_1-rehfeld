@@ -4,9 +4,10 @@
 
 package de.beuth.raytracer.mathlibrary;
 
-import de.beuth.raytracer.mathlibrary.interfaces.INormal3;
-
-public class Normal3 implements INormal3 {
+/**
+ * describes a normal
+ */
+public class Normal3 {
 
     /**
      * the x-position of the normal

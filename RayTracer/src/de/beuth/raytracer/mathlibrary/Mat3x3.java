@@ -4,9 +4,10 @@
 
 package de.beuth.raytracer.mathlibrary;
 
-import de.beuth.raytracer.mathlibrary.interfaces.IMat3x3;
-
-public class Mat3x3 implements IMat3x3 {
+/**
+ * describes a 3x3 matrix
+ */
+public class Mat3x3 {
 
     /**
      * matrix positions i,j

@@ -4,16 +4,17 @@
 package de.beuth.raytracer.application;
 
 import de.beuth.raytracer.camera.Camera;
+import de.beuth.raytracer.edgeDetection.EdgeDetection;
 import de.beuth.raytracer.geometry.Hit;
 import de.beuth.raytracer.mathlibrary.Ray;
 import de.beuth.raytracer.world.World;
 
-import javax.swing.JComponent;
-import java.awt.Graphics;
-import java.awt.Color;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
+
 
 /**
  * draws a JComponent, where the image is drawn in there
@@ -24,15 +25,25 @@ public class Draw extends JComponent {
 
     private final World world;
     private final Camera camera;
+    private boolean edgeDetection;
 
     /**
      * standard constructor
      */
-    public Draw(final World world, final Camera camera) {
+    public Draw(final World world, final Camera camera, boolean mode) {
         this.world = world;
         this.camera = camera;
+        this.edgeDetection = mode;
     }
 
+    public void toggleEdgeDetection() {
+        if (this.edgeDetection) {
+            this.edgeDetection = false;
+        } else {
+            this.edgeDetection = true;
+        }
+        this.repaint();
+    }
     /**
      * paint method creates the image with the red line
      * @param g hte graphics object drawn on
@@ -47,14 +58,9 @@ public class Draw extends JComponent {
         ColorModel colorModel = image.getColorModel();
 
         /**
-         * Set the two colors needed
-         */
-        final int blackValue = Color.black.getRGB();
-        final int redValue = Color.red.getRGB();
-        /**
          * draw whole image black
          */
-        writableRaster.setDataElements(0, 0, 1, 1, colorModel.getDataElements(blackValue, null));
+        writableRaster.setDataElements(0, 0, 1, 1, colorModel.getDataElements(World.BACKGROUND_COLOR.toRGB().getRGB(), null));
 
 
         /**
@@ -70,7 +76,6 @@ public class Draw extends JComponent {
          */
         for (int x = 0; x < w; x++) {
             for (int y = 0; y < h; y++) {
-
                 // get the ray for the current position
                 ray = camera.rayFor(w, h, x, y);
 
@@ -82,7 +87,16 @@ public class Draw extends JComponent {
                  * else get default black background color
                  */
                 if (hit != null) {
-                    color = hit.geo.color;
+                    /**
+                     * color to draw the normals of the image
+                     */
+                     //color = new de.beuth.raytracer.color.Color(hit.n.x, hit.n.y, hit.n.z);
+
+                    /**
+                     * color of the given geometries
+                     */
+                    color = hit.geo.material.colorFor(hit, world);
+
                 } else {
                     color = World.BACKGROUND_COLOR;
                 }
@@ -95,7 +109,12 @@ public class Draw extends JComponent {
         /**
          * draw image on graphic object and show it to the user
          */
-        g.drawImage(image, 0, 0, Color.BLACK, this);
+        if (this.edgeDetection) {
+            g.drawImage(new EdgeDetection().edgeDetect(image), 0, 0, java.awt.Color.BLACK, this);
+        } else {
+            g.drawImage(image, 0, 0, java.awt.Color.BLACK, this);
+        }
+
     }
 
 }

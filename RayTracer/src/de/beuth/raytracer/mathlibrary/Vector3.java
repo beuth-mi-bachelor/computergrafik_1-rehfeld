@@ -4,9 +4,10 @@
 
 package de.beuth.raytracer.mathlibrary;
 
-import de.beuth.raytracer.mathlibrary.interfaces.IVector3;
-
-public class Vector3 implements IVector3 {
+/**
+ * describes a vector
+ */
+public class Vector3 {
 
     /**
      * the x-position of the vector
@@ -176,8 +177,7 @@ public class Vector3 implements IVector3 {
      * @param v is a normal
      * @return a new vector which is a distance
      */
-    public double distance(Point3 v)
-    {
+    public double distance(Point3 v) {
         Normal3 n = new Normal3(v.x, v.y, v.z);
         return sub(n).calculateMagnitude();
     }

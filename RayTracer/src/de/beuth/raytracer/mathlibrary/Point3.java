@@ -4,9 +4,10 @@
 
 package de.beuth.raytracer.mathlibrary;
 
-import de.beuth.raytracer.mathlibrary.interfaces.IPoint3;
-
-public class Point3 implements IPoint3 {
+/**
+ * describes a point
+ */
+public class Point3 {
 
     /**
      * the x-position of the point

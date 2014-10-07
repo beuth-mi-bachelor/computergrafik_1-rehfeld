@@ -7,12 +7,13 @@ package de.beuth.raytracer.world;
 import de.beuth.raytracer.color.Color;
 import de.beuth.raytracer.geometry.Geometry;
 import de.beuth.raytracer.geometry.Hit;
+import de.beuth.raytracer.light.Light;
 import de.beuth.raytracer.mathlibrary.Ray;
 
 import java.util.ArrayList;
 
 /**
- * class of world
+ * describes the world
  */
 public class World {
 
@@ -27,11 +28,20 @@ public class World {
     public final ArrayList<Geometry> geoList;
 
     /**
+     * list of all lights
+     */
+    public final ArrayList<Light> ambientLights;
+
+    public final Color ambientLight;
+
+    /**
      * creates a new instance of world
      * @param listOfGeometry ArrayList der Geometry
      */
-    public World(final ArrayList<Geometry> listOfGeometry) {
-        geoList = listOfGeometry;
+    public World(final ArrayList<Geometry> listOfGeometry, final ArrayList<Light> lights, Color ambientLight) {
+        this.geoList = listOfGeometry;
+        this.ambientLights = lights;
+        this.ambientLight = ambientLight;
     }
 
     /**
@@ -39,7 +49,7 @@ public class World {
      * @param r ray which hit is tested with
      * @return minimal t as point of hit
      */
-    public Hit hit(Ray r) {
+    public Hit hit(final Ray r) {
         ArrayList<Hit> hitted = new ArrayList<Hit>();
         Hit hit = null;
         double minimalHit = Double.MAX_VALUE;
@@ -70,7 +80,7 @@ public class World {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 

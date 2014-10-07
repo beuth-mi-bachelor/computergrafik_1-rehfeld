@@ -4,12 +4,11 @@
 
 package de.beuth.raytracer.camera;
 
-import de.beuth.raytracer.camera.interfaces.ICamera;
 import de.beuth.raytracer.mathlibrary.Point3;
 import de.beuth.raytracer.mathlibrary.Ray;
 import de.beuth.raytracer.mathlibrary.Vector3;
 
-public abstract class Camera implements ICamera {
+public abstract class Camera {
 
     /**
      * eye position point
@@ -62,7 +61,6 @@ public abstract class Camera implements ICamera {
      * @param y coordinate of the pixel
      * @return a generated ray of one pixel
      */
-    @Override
     public Ray rayFor(final int w, final int h, final int x, final int y) {
 
         Vector3 d = this.w.mul(-1);

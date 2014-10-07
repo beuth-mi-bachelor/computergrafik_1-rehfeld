@@ -4,16 +4,10 @@
 package de.beuth.raytracer.application;
 
 import de.beuth.raytracer.camera.Camera;
-import de.beuth.raytracer.testing.Exercise2Testing;
 import de.beuth.raytracer.world.World;
 
 import javax.imageio.ImageIO;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JFileChooser;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -34,37 +28,47 @@ public class RayTracer extends JFrame implements ActionListener {
      */
     private Draw imageContainer;
 
+    private JProgressBar pbar;
+
     public RayTracer(World world, Camera camera) {
 
         /**
          * Set width and height of window
          */
         this.setSize(new Dimension(WIDTH, HEIGHT));
+        this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         /**
          * Creates the menü
          */
         JMenuBar menu = new JMenuBar();
         JMenu file = new JMenu("Datei");
+        JMenu options = new JMenu("Optionen");
         JMenuItem saveItem = new JMenuItem("Speichern");
+        JMenuItem edgeDetection = new JMenuItem("Kantendetektion");
+        edgeDetection.addActionListener(this);
         saveItem.addActionListener(this);
         file.add (saveItem);
+        options.add (edgeDetection);
         menu.add(file);
+        menu.add(options);
         this.setJMenuBar(menu);
+
+        /**
+         * Set window to visible
+         */
 
         /**
          * Creates a new Frame with the image painted inside
          */
-        this.imageContainer = new Draw(world, camera);
+        this.imageContainer = new Draw(world, camera, false);
         /**
          * Add this frame to the window
          */
         this.add(this.imageContainer);
 
-        /**
-         * Set window to visible
-         */
-        setVisible(true);
+        this.setVisible(true);
+
     }
 
     /**
@@ -73,6 +77,9 @@ public class RayTracer extends JFrame implements ActionListener {
      */
     @Override
     public void actionPerformed(ActionEvent e) {
+        if (e.getActionCommand().equals("Kantendetektion")) {
+            this.imageContainer.toggleEdgeDetection();
+        }
         /**
          * If save is clicked
          */
@@ -115,25 +122,5 @@ public class RayTracer extends JFrame implements ActionListener {
                 }
             }
         }
-    }
-
-    /**
-     * Main Method to start that exercise
-     * @param args arguments for test-run
-     */
-    public static void main(String args[]) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                Exercise2Testing.runEx1();
-                Exercise2Testing.runEx2();
-                Exercise2Testing.runEx3();
-                Exercise2Testing.runEx4();
-                Exercise2Testing.runEx5();
-                Exercise2Testing.runEx6();
-                Exercise2Testing.runEx7();
-
-            }
-        });
     }
 }

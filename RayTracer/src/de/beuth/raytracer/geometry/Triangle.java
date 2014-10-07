@@ -4,15 +4,16 @@
 
 package de.beuth.raytracer.geometry;
 
-import de.beuth.raytracer.color.Color;
-import de.beuth.raytracer.geometry.interfaces.ITriangle;
-import de.beuth.raytracer.mathlibrary.*;
-import de.beuth.raytracer.world.World;
+import de.beuth.raytracer.material.Material;
+import de.beuth.raytracer.mathlibrary.Normal3;
+import de.beuth.raytracer.mathlibrary.Point3;
+import de.beuth.raytracer.mathlibrary.Ray;
+import de.beuth.raytracer.mathlibrary.Vector3;
 
 /**
  * class represents a triangle
  */
-public class Triangle extends Geometry implements ITriangle {
+public class Triangle extends Geometry {
 
     /**
      * one edge of triangle
@@ -34,10 +35,10 @@ public class Triangle extends Geometry implements ITriangle {
      * @param a one edge of triangle
      * @param b one edge of triangle
      * @param c one edge of triangle
-     * @param color color of the geometry
+     * @param material material of the geometry
      */
-    public Triangle(final Point3 a, final Point3 b, final Point3 c, final Color color) {
-        super(color);
+    public Triangle(final Point3 a, final Point3 b, final Point3 c, final Material material) {
+        super(material);
         this.a = a;
         this.b = b;
         this.c = c;
@@ -53,6 +54,7 @@ public class Triangle extends Geometry implements ITriangle {
 
         Vector3 edge1 = this.b.sub(this.a);
         Vector3 edge2 = this.c.sub(this.a);
+        Vector3 edge3 = this.b.sub(this.c);
 
         /**
          * Find the cross product of edge2 and the ray direction
@@ -92,7 +94,9 @@ public class Triangle extends Geometry implements ITriangle {
 
         double t = edge2.dot(s2) * invDivisor;
 
-        return new Hit(t, r, this);
+        Normal3 n = edge1.x(edge2).normalized().asNormal();
+
+        return new Hit(t, r, this, n);
     }
 
     @Override

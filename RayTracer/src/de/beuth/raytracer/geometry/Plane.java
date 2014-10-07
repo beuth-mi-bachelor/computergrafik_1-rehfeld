@@ -4,17 +4,15 @@
 
 package de.beuth.raytracer.geometry;
 
-import de.beuth.raytracer.color.Color;
-import de.beuth.raytracer.geometry.interfaces.IPlane;
+import de.beuth.raytracer.material.Material;
 import de.beuth.raytracer.mathlibrary.Normal3;
 import de.beuth.raytracer.mathlibrary.Point3;
 import de.beuth.raytracer.mathlibrary.Ray;
-import de.beuth.raytracer.world.World;
 
 /**
  * the object of a plane-geometry
  */
-public class Plane extends Geometry implements IPlane {
+public class Plane extends Geometry {
 
     /**
      * point of a plane
@@ -30,10 +28,10 @@ public class Plane extends Geometry implements IPlane {
      * defines a new plane
      * @param a point of the plane
      * @param n normal of the plane
-     * @param color Color of the geometry
+     * @param material material of the geometry
      */
-    public Plane(final Point3 a, final Normal3 n, final Color color) {
-        super(color);
+    public Plane(final Point3 a, final Normal3 n, final Material material) {
+        super(material);
         this.a = a;
         this.n = n;
     }
@@ -46,12 +44,12 @@ public class Plane extends Geometry implements IPlane {
     @Override
     public Hit hit(final Ray r) {
         double t2 = r.d.dot(n);
-        if( t2 != 0.0 ) {
-            double t = a.sub( r.o ).dot( n ) / t2;
+        if(t2 != 0.0) {
+            double t = a.sub(r.o).dot(n) / t2;
             if(t < 0) {
                 return null;
             }
-            return new Hit(t, r, this);
+            return new Hit(t, r, this, n);
         }
 
         return null;

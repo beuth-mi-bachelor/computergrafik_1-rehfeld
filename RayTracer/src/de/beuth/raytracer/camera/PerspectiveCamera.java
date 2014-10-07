@@ -4,12 +4,11 @@
 
 package de.beuth.raytracer.camera;
 
-import de.beuth.raytracer.camera.interfaces.IPerspectiveCamera;
 import de.beuth.raytracer.mathlibrary.Point3;
 import de.beuth.raytracer.mathlibrary.Ray;
 import de.beuth.raytracer.mathlibrary.Vector3;
 
-public class PerspectiveCamera extends Camera implements IPerspectiveCamera {
+public class PerspectiveCamera extends Camera {
 
     /**
      * angle factor angle

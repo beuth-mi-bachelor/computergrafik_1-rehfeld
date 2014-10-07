@@ -4,32 +4,25 @@
 
 package de.beuth.raytracer.geometry;
 
-import de.beuth.raytracer.color.Color;
-import de.beuth.raytracer.geometry.interfaces.IGeometry;
+import de.beuth.raytracer.material.Material;
 import de.beuth.raytracer.mathlibrary.Ray;
 
 /**
  * the abstract geometry object
  */
-public abstract class Geometry implements IGeometry {
+public abstract class Geometry {
 
     /**
      * defines the color of the geometry
      */
-    public final Color color;
+    public final Material material;
+
     /**
-     * creates a new instance of geometry. If no color is there, color will be black
+     * creates an instance of geometry
+     * @param material defines a base material
      */
-    /*public Geometry() {
-        this.color = new Color(0, 0, 0);
-    }
-*/
-    /**
-     * creates a new instance of geometry
-     * @param color defines a base color for the geometry
-     */
-    public Geometry(final Color color) {
-        this.color = color;
+    public Geometry(final Material material) {
+        this.material = material;
     }
 
     public abstract Hit hit(final Ray r);
@@ -37,7 +30,7 @@ public abstract class Geometry implements IGeometry {
     @Override
     public String toString() {
         return "Geometry{" +
-                "color=" + color +
+                "material=" + material +
                 '}';
     }
 
@@ -48,13 +41,13 @@ public abstract class Geometry implements IGeometry {
 
         Geometry geometry = (Geometry) o;
 
-        if (color != null ? !color.equals(geometry.color) : geometry.color != null) return false;
+        if (material != null ? !material.equals(geometry.material) : geometry.material != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        return color != null ? color.hashCode() : 0;
+        return material != null ? material.hashCode() : 0;
     }
 }

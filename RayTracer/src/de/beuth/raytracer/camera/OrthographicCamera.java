@@ -4,12 +4,11 @@
 
 package de.beuth.raytracer.camera;
 
-import de.beuth.raytracer.camera.interfaces.IOrthographicCamera;
 import de.beuth.raytracer.mathlibrary.Point3;
 import de.beuth.raytracer.mathlibrary.Ray;
 import de.beuth.raytracer.mathlibrary.Vector3;
 
-public class OrthographicCamera extends Camera implements IOrthographicCamera {
+public class OrthographicCamera extends Camera {
 
     /**
      * scale factor s

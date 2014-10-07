@@ -4,18 +4,16 @@
 
 package de.beuth.raytracer.geometry;
 
-import de.beuth.raytracer.color.Color;
-import de.beuth.raytracer.geometry.interfaces.ISphere;
+import de.beuth.raytracer.material.Material;
 import de.beuth.raytracer.mathlibrary.Normal3;
 import de.beuth.raytracer.mathlibrary.Point3;
 import de.beuth.raytracer.mathlibrary.Ray;
 import de.beuth.raytracer.mathlibrary.Vector3;
-import de.beuth.raytracer.world.World;
 
 /**
  * class represents a 3d circle
  */
-public class Sphere extends Geometry implements ISphere {
+public class Sphere extends Geometry {
 
     /**
      * center of the sphere
@@ -31,10 +29,10 @@ public class Sphere extends Geometry implements ISphere {
      * creates a new sphere
      * @param c point in center of the sphere
      * @param r radius of the sphere
-     * @param color color of the sphere
+     * @param material material of the sphere
      */
-    public Sphere(final Point3 c, final double r, final Color color) {
-        super(color);
+    public Sphere(final Point3 c, final double r, final Material material) {
+        super(material);
         this.c = c;
         this.r = r;
     }
@@ -72,7 +70,9 @@ public class Sphere extends Geometry implements ISphere {
                 return null;
             }
 
-            return new Hit (t, r, this);
+            Normal3 n = r.at(t).sub(this.c).normalized().asNormal();
+
+            return new Hit (t, r, this, n);
         }
         else {
             return null;

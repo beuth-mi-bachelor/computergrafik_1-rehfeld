@@ -4,16 +4,15 @@
 
 package de.beuth.raytracer.geometry;
 
-import de.beuth.raytracer.color.Color;
-import de.beuth.raytracer.geometry.interfaces.IAxisAlignedBox;
+import de.beuth.raytracer.material.Material;
+import de.beuth.raytracer.mathlibrary.Normal3;
 import de.beuth.raytracer.mathlibrary.Point3;
 import de.beuth.raytracer.mathlibrary.Ray;
-import de.beuth.raytracer.world.World;
 
 /**
  * class represents a box
  */
-public class AxisAlignedBox extends Geometry implements IAxisAlignedBox {
+public class AxisAlignedBox extends Geometry {
 
     /**
      * left bottom point
@@ -29,10 +28,10 @@ public class AxisAlignedBox extends Geometry implements IAxisAlignedBox {
      * defines a axis aligned box
      * @param lbf point
      * @param run point
-     * @param color color
+     * @param material material
      */
-    public AxisAlignedBox(final Point3 lbf, final Point3 run, final Color color) {
-        super(color);
+    public AxisAlignedBox(final Point3 lbf, final Point3 run, final Material material) {
+        super(material);
         this.lbf = lbf;
         this.run = run;
     }
@@ -65,6 +64,9 @@ public class AxisAlignedBox extends Geometry implements IAxisAlignedBox {
 
         double tmin;
 
+        int front;
+        int back;
+
         // from book: raytracing from ground up
         if ((a) >= 0.0) {
             tx_min = (lbf.x - ox) * (a);
@@ -90,35 +92,86 @@ public class AxisAlignedBox extends Geometry implements IAxisAlignedBox {
 
         if (tx_min > ty_min) {
             t0 = tx_min;
+            if (a >= 0.0) {
+                front = 0;
+            } else {
+                front = 3;
+            }
         } else {
             t0 = ty_min;
+            if (b >= 0.0) {
+                front = 1;
+            } else {
+                front = 4;
+            }
         }
         if (tz_min > t0) {
             t0 = tz_min;
+            if (c >= 0.0) {
+                front = 2;
+            } else {
+                front = 5;
+            }
         }
         if (tx_max < ty_max) {
             t1 = tx_max;
+            if (a >= 0.0) {
+                back = 3;
+            } else {
+                back = 0;
+            }
         } else {
             t1 = ty_max;
+            if (b >= 0.0) {
+                back = 4;
+            } else {
+                back = 1;
+            }
         }
         if (tz_max < t1) {
             t1 = tz_max;
+            if (c >= 0.0) {
+                back = 5;
+            } else {
+                back = 2;
+            }
         }
 
         if (t0 < t1 && t1 > 0) {
             if (t0 > 0) {
                 tmin = t0;
-                return new Hit(tmin, r, this);
+                Normal3 n = this.getNormalOfSite(front);
+                return new Hit(tmin, r, this, n);
             } else {
                 tmin = t1;
-                return new Hit(tmin, r, this);
+                Normal3 n = this.getNormalOfSite(front);
+                return new Hit(tmin, r, this, n);
             }
         } else {
             return null;
         }
     }
 
-        @Override
+    private Normal3 getNormalOfSite(final int inBetween) {
+        switch (inBetween) {
+            case 0:
+                return (new Normal3(1.0, 0.0, 0.0));
+            case 1:
+                return (new Normal3(0.0, 1.0, 0.0));
+            case 2:
+                return (new Normal3(0.0, 0.0, 1.0));
+            case 3:
+                return (new Normal3(1.0, 0.0, 0.0));
+            case 4:
+                return (new Normal3(0.0, 1.0, 0.0));
+            case 5:
+                return (new Normal3(0.0, 0.0, 1.0));
+            default:
+                return (null);
+        }
+    }
+
+    @Override
     public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

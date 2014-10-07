@@ -4,9 +4,7 @@
 
 package de.beuth.raytracer.color;
 
-import de.beuth.raytracer.color.interfaces.IColor;
-
-public class Color implements IColor{
+public class Color {
 
     /**
      * value of the red color.
@@ -29,12 +27,34 @@ public class Color implements IColor{
      */
     public Color (final double r, final double g, final double b) {
 
-        if (r >= 0 && r <= 1 && g >= 0 && g <= 1 && b >= 0 && b <= 1) {
-            this.r = r;
-            this.g = g;
-            this.b = b;
+        if (r > 1 || r < 0) {
+            if (r > 1) {
+                this.r = 1.0;
+            } else {
+                this.r = 0.0;
+            }
         } else {
-            throw new IllegalArgumentException("please insert only values between 0 and 1.");
+            this.r = r;
+        }
+
+        if (g > 1 || g < 0) {
+            if (g > 1) {
+                this.g = 1.0;
+            } else {
+                this.g = 0.0;
+            }
+        } else {
+            this.g = g;
+        }
+
+        if (b > 1 || b < 0) {
+            if (b > 1) {
+                this.b = 1.0;
+            } else {
+                this.b = 0.0;
+            }
+        } else {
+            this.b = b;
         }
 
     }
@@ -44,18 +64,8 @@ public class Color implements IColor{
      * @param c Color
      * @return a new color model
      */
-    @Override
-    public Color add(Color c) {
-
-        if (c.r >= 0 && c.r <= 1 && c.g >= 0 && c.g <= 1 && c.b >= 0 && c.b <= 1) {
-            double newr = r + c.r;
-            double newg = g + c.g;
-            double newb = b + c.b;
-            return new Color(newr, newg, newb);
-        }
-            throw new IllegalArgumentException("Bitte nur Werte zwischen 0 und 1 eingeben.");
-
-
+    public Color add(final Color c) {
+        return new Color(this.r + c.r, this.g + c.g, this.b + c.b);
     }
 
     /**
@@ -63,16 +73,8 @@ public class Color implements IColor{
      * @param c Color
      * @return a new color model
      */
-    @Override
-    public Color sub(Color c) {
-
-        if (c.r >= 0 && c.r <= 1 && c.g >= 0 && c.g <= 1 && c.b >= 0 && c.b <= 1) {
-            double newr = r - c.r;
-            double newg = g - c.g;
-            double newb = b - c.b;
-            return new Color(newr, newg, newb);
-        }
-            throw new IllegalArgumentException("Bitte nur Werte zwischen 0 und 1 eingeben.");
+    public Color sub(final Color c) {
+        return  new Color(this.r - c.r, this.g - c.g, this.b - c.b);
     }
 
     /**
@@ -80,16 +82,8 @@ public class Color implements IColor{
      * @param c Color
      * @return a new color model
      */
-    @Override
-    public Color mul(Color c) {
-
-        if (c.r >= 0 && c.r <= 1 && c.g >= 0 && c.g <= 1 && c.b >= 0 && c.b <= 1) {
-            double newr = r * c.r;
-            double newg = g * c.g;
-            double newb = b * c.b;
-            return new Color(newr, newg, newb);
-        }
-            throw new IllegalArgumentException("Bitte nur Werte zwischen 0 und 1 eingeben.");
+    public Color mul(final Color c) {
+        return new Color(this.r * c.r, this.g * c.g, this.b * c.b);
     }
 
     /**
@@ -97,13 +91,8 @@ public class Color implements IColor{
      * @param v double
      * @return a new color model
      */
-    @Override
-    public Color mul(double v) {
-
-        double newr = r * v;
-        double newg = g * v;
-        double newb = b * v;
-        return new Color(newr, newg, newb);
+    public Color mul(final double v) {
+        return new Color(this.r * v, this.g * v, this.b * v);
     }
 
     /**

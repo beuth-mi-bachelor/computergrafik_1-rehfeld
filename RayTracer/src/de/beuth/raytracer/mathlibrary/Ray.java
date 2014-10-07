@@ -4,12 +4,10 @@
 
 package de.beuth.raytracer.mathlibrary;
 
-import de.beuth.raytracer.mathlibrary.interfaces.IRay;
-
 /**
- * this class represents a ray
+ * describes a ray
  */
-public class Ray implements IRay {
+public class Ray {
 
     /**
      * is the origin of the ray
@@ -36,7 +34,6 @@ public class Ray implements IRay {
      * o + (d * t)
      * @param t double is the distance from origin o
      */
-    @Override
     public Point3 at(final double t){
         return o.add(d.mul(t));
     }

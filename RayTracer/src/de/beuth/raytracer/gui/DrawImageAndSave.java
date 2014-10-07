@@ -18,13 +18,16 @@ import javax.swing.JFileChooser;
 import javax.swing.WindowConstants;
 import javax.swing.SwingUtilities;
 
+/**
+ * describes the image saver
+ */
 public class DrawImageAndSave extends JFrame implements ActionListener {
 
     /**
      * static Width and Height declaration
      */
-    final static int WIDTH = 640;
-    final static int HEIGHT = 480;
+    public final static int WIDTH = 640;
+    public final static int HEIGHT = 480;
 
     /**
      * The Frame inside containing the image
@@ -119,7 +122,7 @@ public class DrawImageAndSave extends JFrame implements ActionListener {
 
     /**
      * Main Method to start that exercise
-     * @param args
+     * @param args start arguments
      */
     public static void main(String args[]) {
         SwingUtilities.invokeLater(new Runnable() {
