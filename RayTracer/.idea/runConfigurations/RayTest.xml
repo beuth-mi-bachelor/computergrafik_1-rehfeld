@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="GUI_aufgabe_1" type="Application" factoryName="Application">
-    <option name="MAIN_CLASS_NAME" value="de.beuth.raytracer.gui.OpenUpAnImage" />
+  <configuration default="false" name="RayTest" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="de.beuth.raytracer.mathlibrary.Ray" />
     <option name="VM_PARAMETERS" value="" />
     <option name="PROGRAM_PARAMETERS" value="" />
     <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
@@ -11,8 +11,6 @@
     <option name="PASS_PARENT_ENVS" value="true" />
     <module name="RayTracer" />
     <envs />
-    <RunnerSettings RunnerId="Run" />
-    <ConfigurationWrapper RunnerId="Run" />
     <method />
   </configuration>
 </component>

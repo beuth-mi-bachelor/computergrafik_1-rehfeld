@@ -99,6 +99,13 @@ public class Vector3 implements IVector3 {
         return new Vector3(x, y, z);
     }
 
+    public Vector3 sub(final Vector3 v) {
+        final double x = this.x - v.x;
+        final double y = this.y - v.y;
+        final double z = this.z - v.z;
+        return new Vector3(x, y, z);
+    }
+
     /**
      * multiplicates a constant with a vector
      * @param c the constant which should be multiplied with the vector
@@ -161,6 +168,18 @@ public class Vector3 implements IVector3 {
         final double y = (this.z * v.x) - (this.x * v.z);
         final double z = (this.x * v.y) - (this.y * v.x);
         return new Vector3(x, y, z);
+    }
+
+    /**
+     * this method substracts a normal with a vector and calculates the magnitude
+     * of the new vector.
+     * @param v is a normal
+     * @return a new vector which is a distance
+     */
+    public double distance(Point3 v)
+    {
+        Normal3 n = new Normal3(v.x, v.y, v.z);
+        return sub(n).calculateMagnitude();
     }
 
     /**
