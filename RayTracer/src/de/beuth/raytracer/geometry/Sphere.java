@@ -9,6 +9,7 @@ import de.beuth.raytracer.mathlibrary.Normal3;
 import de.beuth.raytracer.mathlibrary.Point3;
 import de.beuth.raytracer.mathlibrary.Ray;
 import de.beuth.raytracer.mathlibrary.Vector3;
+import de.beuth.raytracer.texture.TexCoord2;
 
 /**
  * class represents a 3d circle
@@ -35,6 +36,16 @@ public class Sphere extends Geometry {
         super(material);
         this.c = c;
         this.r = r;
+    }
+
+    /**
+     * creates a new sphere
+     * @param material material of the sphere
+     */
+    public Sphere(final Material material) {
+        super(material);
+        this.c = new Point3(0, 0, 0);
+        this.r = 1;
     }
 
     /**
@@ -74,12 +85,25 @@ public class Sphere extends Geometry {
             }
             if (t > Geometry.EPSILON) {
                 Normal3 n = r.at(t).sub(this.c).normalized().asNormal();
-                return new Hit(t, r, this, n);
+                return new Hit(t, r, this, n, texCordFor(r.at(t)));
             }
         }
             return null;
     }
 
+    private TexCoord2 texCordFor(Point3 p) {
+        Vector3 d = new Vector3(p.x, p.y, p.z);
+        double theta = Math.acos(d.y);
+        double phi = Math.atan2(d.x, d.z);
+        return new TexCoord2(phi / (Math.PI*2), -(theta/Math.PI));
+    }
+/*
+    private def texCoordFor( p : Point3 ) : TexCoord2D = {
+        val d = p.asVector
+        val theta = math.acos( d.y )
+        val phi = math.atan2( d.x, d.z )
+        TexCoord2D( phi / (math.Pi * 2), -(theta/math.Pi) )
+    }*/
     /**
      * converts any Material from a geometry into a singleColorMaterial
      *

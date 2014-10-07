@@ -13,6 +13,7 @@ import de.beuth.raytracer.material.Tracer;
 import de.beuth.raytracer.mathlibrary.Mat3x3;
 import de.beuth.raytracer.mathlibrary.Normal3;
 import de.beuth.raytracer.mathlibrary.Ray;
+import de.beuth.raytracer.sampling.Sampler;
 import de.beuth.raytracer.world.World;
 
 import java.awt.*;
@@ -21,6 +22,7 @@ import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -28,10 +30,11 @@ import java.util.concurrent.TimeUnit;
 public class ImageMaker extends Canvas {
 
     private BufferedImage image;
-    private Frame parentComponent;
     private boolean edgeDetection;
     private boolean normalImage;
     private boolean celShading;
+
+    private Integer processors;
 
     public final static Mat3x3 ma1 = new Mat3x3(-1, -2, -1, 0, 0, 0, 1, 2, 1);
     public final static Mat3x3 ma2 = new Mat3x3(-1, 0, 1, -2, 0, 2, -1, 0, 1);
@@ -43,14 +46,19 @@ public class ImageMaker extends Canvas {
     public int imageWidth;
     public int imageHeight;
 
-    public ImageMaker(final Frame parentComponent, World world, Camera camera) {
-        this.parentComponent = parentComponent;
-        this.imageWidth = parentComponent.getWidth();
-        this.imageHeight = parentComponent.getHeight();
+    public ImageMaker(final World world, final Camera camera, final Integer... processorsTest) {
+        this.imageWidth = RayTracer.WIDTH;
+        this.imageHeight = RayTracer.HEIGHT;
         this.image = new BufferedImage(this.imageWidth, this.imageHeight, BufferedImage.TYPE_INT_RGB);
         this.edgeDetection = false;
         this.normalImage = false;
         this.celShading = false;
+        if (processorsTest.length == 0) {
+            this.processors = Runtime.getRuntime().availableProcessors();
+        } else {
+            this.processors = processorsTest[0];
+        }
+
 
         ArrayList<Geometry> celShadingGeo = new ArrayList<Geometry>();
         for(Geometry geometry : world.geoList){
@@ -61,7 +69,7 @@ public class ImageMaker extends Canvas {
 
         this.world = world;
         this.camera = camera;
-        this.makeImage();
+
     }
 
     public BufferedImage getImage() {
@@ -69,9 +77,10 @@ public class ImageMaker extends Canvas {
     }
 
     private void updateSizes() {
-        this.imageWidth = parentComponent.getWidth();
-        this.imageHeight = parentComponent.getHeight();
+        this.imageWidth = RayTracer.WIDTH;
+        this.imageHeight = RayTracer.HEIGHT;
         this.image = new BufferedImage(this.imageWidth, this.imageHeight, BufferedImage.TYPE_INT_RGB);
+        this.paint(this.getGraphics());
     }
 
     public BufferedImage makeImage() {
@@ -95,13 +104,13 @@ public class ImageMaker extends Canvas {
         final int w = this.imageWidth;
         final int h = this.imageHeight;
 
-        final int slices = Runtime.getRuntime().availableProcessors() * 5;
+        final int slices = 10;
         final int restOfWidth = w % slices;
         final int restOfHeight = h % slices;
         final int widthToSlice = w - restOfWidth;
         final int heightToSlice = h - restOfHeight;
 
-        Collection<Rectangle> listOfRectangles = new ArrayList<Rectangle>();
+        java.util.List<Rectangle> listOfRectangles = new ArrayList<Rectangle>();
 
         for (int x = 0; x <= widthToSlice; x += slices) {
             for (int y = 0; y <= heightToSlice; y += slices) {
@@ -118,26 +127,28 @@ public class ImageMaker extends Canvas {
                 listOfRectangles.add(rec);
             }
         }
+        Collections.shuffle(listOfRectangles);
         return listOfRectangles;
     }
 
     private void calculateImage(final Collection<Rectangle> listOfRectangles, final int w, final int h) {
-        final int processors = Runtime.getRuntime().availableProcessors();
+        final int processors = this.processors;
         final ExecutorService executor = Executors.newFixedThreadPool(processors);
-        for (final Rectangle rect : listOfRectangles) {
 
+        final ImageMaker imgMaker = this;
+
+        for (final Rectangle rect : listOfRectangles) {
             executor.execute(new Runnable() {
                 public void run() {
                     renderData(rect, w, h, image.getColorModel(), image.getRaster());
                 }
             });
-
-            renderData(rect, w, h, image.getColorModel(), image.getRaster());
         }
 
         executor.shutdown();
         try {
-            executor.awaitTermination(100, TimeUnit.SECONDS);
+            // 33 Minutes until termination
+            executor.awaitTermination(2000, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             System.out.println(e.getMessage());
         }
@@ -236,23 +247,20 @@ public class ImageMaker extends Canvas {
                     } else if (this.celShading) {
                         color = this.getCelShadingColor(ray);
                     } else {
-                        color = this.getColor(ray);
+                        color = this.getColor(hit, ray);
                     }
                 } else {
                     color = World.BACKGROUND_COLOR;
                 }
+
                 writableRaster.setDataElements(x, h - y - 1, colorModel.getDataElements(color.toRGB().getRGB(), null));
             }
         }
     }
 
-    public de.beuth.raytracer.color.Color getColor(final Ray r) {
-        final Hit hit = this.world.hit(r);
-        if (hit != null) {
-            return hit.geo.material.colorFor(hit, this.world, new Tracer(this.world, 6));
-        } else {
-            return World.BACKGROUND_COLOR;
-        }
+    public de.beuth.raytracer.color.Color getColor(final Hit hit, final Ray ray) {
+        //return Sampler.colorFor(world, hit, ray);
+        return hit.geo.material.colorFor(hit, this.world, new Tracer(this.world, 6));
     }
 
     public de.beuth.raytracer.color.Color getNormalColor(final Ray r) {
@@ -301,7 +309,7 @@ public class ImageMaker extends Canvas {
             }
 
         } else {
-            return world.BACKGROUND_COLOR;
+            return World.BACKGROUND_COLOR;
         }
     }
 

@@ -4,11 +4,11 @@
 
 package de.beuth.raytracer.geometry;
 
-import de.beuth.raytracer.color.Color;
 import de.beuth.raytracer.material.Material;
 import de.beuth.raytracer.mathlibrary.Normal3;
 import de.beuth.raytracer.mathlibrary.Point3;
 import de.beuth.raytracer.mathlibrary.Ray;
+import de.beuth.raytracer.texture.TexCoord2;
 
 /**
  * the object of a plane-geometry
@@ -38,6 +38,16 @@ public class Plane extends Geometry {
     }
 
     /**
+     * defines a new plane
+     * @param material material of the geometry
+     */
+    public Plane(final Material material) {
+        super(material);
+        this.a = new Point3(0, 0, 0);
+        this.n = new Normal3(0, 1, 0);
+    }
+
+    /**
      * looks for a hit between a ray and a plane
      * @param r the ray tested with the hit
      * @return a hit or null
@@ -51,7 +61,7 @@ public class Plane extends Geometry {
                 return null;
             }
 
-            return new Hit(t, r, this, n);
+            return new Hit(t, r, this, n, new TexCoord2(r.at(t).x, -(r.at(t).z)));
         }
 
         return null;

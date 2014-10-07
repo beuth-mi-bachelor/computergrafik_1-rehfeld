@@ -9,6 +9,8 @@ import de.beuth.raytracer.geometry.Hit;
 import de.beuth.raytracer.light.Light;
 import de.beuth.raytracer.mathlibrary.Point3;
 import de.beuth.raytracer.mathlibrary.Vector3;
+import de.beuth.raytracer.texture.SingleColorTexture;
+import de.beuth.raytracer.texture.Texture;
 import de.beuth.raytracer.world.World;
 
 /**
@@ -19,7 +21,7 @@ public class CelShadingMaterial extends Material {
     /**
      * the color
      */
-    public Color color;
+    public Texture texture;
 
     /**
      * the factor to calculate the different grades
@@ -29,10 +31,10 @@ public class CelShadingMaterial extends Material {
     /**
      * instanciates a cel-shading material
      *
-     * @param color the material color
+     * @param texture the material texture
      */
-    public CelShadingMaterial(final Color color) {
-        this.color = color;
+    public CelShadingMaterial(final Texture texture) {
+        this.texture = texture;
     }
 
     /**
@@ -46,7 +48,7 @@ public class CelShadingMaterial extends Material {
     @Override
     public Color colorFor(final Hit hit, final World world, final Tracer tracer) {
         final Point3 hitPoint = hit.r.at(hit.t);
-        Color returnColor = this.color.mul(world.ambientLight);
+        Color returnColor = this.texture.getColor(0, 0).mul(world.ambientLight);
         for (Light currentLight : world.ambientLights) {
             if (currentLight.illuminates(hitPoint, world)) {
                 final Vector3 l = currentLight.directionFrom(hitPoint).normalized();
@@ -72,7 +74,7 @@ public class CelShadingMaterial extends Material {
                 if (c > (5 * FACTOR_SEPARATOR) && c <= 1) {
                     c = 1;
                 }
-                returnColor = returnColor.add(color.mul(currentLight.color).mul(c));
+                returnColor = returnColor.add(texture.getColor(hit.tc.u, hit.tc.v).mul(currentLight.color).mul(c));
 
             }
         }
@@ -97,13 +99,13 @@ public class CelShadingMaterial extends Material {
      */
     @Override
     public SingleColorMaterial convertToSingelColorMaterial() {
-        return new SingleColorMaterial(this.color);
+        return new SingleColorMaterial(this.texture);
     }
 
     @Override
     public String toString() {
         return "CelShadingMaterial{" +
-                "color=" + color +
+                "texture=" + texture +
                 '}';
     }
 
@@ -118,7 +120,7 @@ public class CelShadingMaterial extends Material {
 
         CelShadingMaterial that = (CelShadingMaterial) o;
 
-        if (color != null ? !color.equals(that.color) : that.color != null) {
+        if (texture != null ? !texture.equals(that.texture) : that.texture != null) {
             return false;
         }
 
@@ -127,6 +129,6 @@ public class CelShadingMaterial extends Material {
 
     @Override
     public int hashCode() {
-        return color != null ? color.hashCode() : 0;
+        return texture != null ? texture.hashCode() : 0;
     }
 }

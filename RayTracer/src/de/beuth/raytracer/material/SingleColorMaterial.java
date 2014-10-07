@@ -7,6 +7,8 @@ package de.beuth.raytracer.material;
 
 import de.beuth.raytracer.color.Color;
 import de.beuth.raytracer.geometry.Hit;
+import de.beuth.raytracer.texture.SingleColorTexture;
+import de.beuth.raytracer.texture.Texture;
 import de.beuth.raytracer.world.World;
 
 /**
@@ -17,14 +19,14 @@ public class SingleColorMaterial extends Material {
     /**
      * the color of the material
      */
-    public final Color color;
+    public final Texture texture;
 
     /**
      * create an instance of a single color material
-     * @param color the color of the material
+     * @param texture the color of the material
      */
-    public SingleColorMaterial(final Color color) {
-        this.color = color;
+    public SingleColorMaterial(final Texture texture) {
+        this.texture = texture;
     }
 
     /**
@@ -35,7 +37,7 @@ public class SingleColorMaterial extends Material {
      * @return color for hit
      */
     public Color colorFor(final Hit hit, final World world, final Tracer tracer) {
-        return this.color;
+        return this.texture.getColor(hit.tc.u, hit.tc.v);
     }
 
     /**
@@ -45,7 +47,7 @@ public class SingleColorMaterial extends Material {
      */
     @Override
     public CelShadingMaterial convertToCelShadingMaterial() {
-        return new CelShadingMaterial(this.color);
+        return new CelShadingMaterial(this.texture);
     }
 
     /**
@@ -61,7 +63,7 @@ public class SingleColorMaterial extends Material {
     @Override
     public String toString() {
         return "SingleColorMaterial{" +
-                "color=" + color +
+                "texture=" + texture +
                 '}';
     }
 
@@ -76,7 +78,7 @@ public class SingleColorMaterial extends Material {
 
         SingleColorMaterial that = (SingleColorMaterial) o;
 
-        if (color != null ? !color.equals(that.color) : that.color != null) {
+        if (texture != null ? !texture.equals(that.texture) : that.texture != null) {
             return false;
         }
 
@@ -85,6 +87,6 @@ public class SingleColorMaterial extends Material {
 
     @Override
     public int hashCode() {
-        return color != null ? color.hashCode() : 0;
+        return texture != null ? texture.hashCode() : 0;
     }
 }

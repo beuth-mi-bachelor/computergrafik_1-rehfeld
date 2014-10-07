@@ -10,6 +10,7 @@ import de.beuth.raytracer.geometry.Hit;
 import de.beuth.raytracer.mathlibrary.Normal3;
 import de.beuth.raytracer.mathlibrary.Ray;
 import de.beuth.raytracer.mathlibrary.Vector3;
+import de.beuth.raytracer.texture.SingleColorTexture;
 import de.beuth.raytracer.world.World;
 
 /**
@@ -82,7 +83,7 @@ public class TransparentMaterial extends Material {
      */
     @Override
     public CelShadingMaterial convertToCelShadingMaterial() {
-        return new CelShadingMaterial(new Color(1, 1, 1));
+        return new CelShadingMaterial(new SingleColorTexture(new Color(1, 1, 1)));
     }
 
     /**
@@ -92,7 +93,7 @@ public class TransparentMaterial extends Material {
      */
     @Override
     public SingleColorMaterial convertToSingelColorMaterial() {
-        return new SingleColorMaterial(new Color(1, 1, 1));
+        return new SingleColorMaterial(new SingleColorTexture(new Color(1, 1, 1)));
     }
 
     @Override

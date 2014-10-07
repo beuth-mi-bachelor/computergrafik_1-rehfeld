@@ -25,7 +25,7 @@ public class World {
     /**
      * refraction index
      */
-    public int refractionIndex;
+    public final double refractionIndex;
 
     /**
      * list of geometries to be displayed
@@ -43,7 +43,7 @@ public class World {
      * creates a new instance of world
      * @param listOfGeometry ArrayList der Geometry
      */
-    public World(final ArrayList<Geometry> listOfGeometry, final ArrayList<Light> lights, Color ambientLight, final int refractionIndex) {
+    public World(final ArrayList<Geometry> listOfGeometry, final ArrayList<Light> lights, Color ambientLight, final double refractionIndex) {
         this.geoList = listOfGeometry;
         this.ambientLights = lights;
         this.ambientLight = ambientLight;

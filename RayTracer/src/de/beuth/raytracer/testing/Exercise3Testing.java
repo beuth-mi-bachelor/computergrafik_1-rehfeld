@@ -16,6 +16,7 @@ import de.beuth.raytracer.material.*;
 import de.beuth.raytracer.mathlibrary.Normal3;
 import de.beuth.raytracer.mathlibrary.Point3;
 import de.beuth.raytracer.mathlibrary.Vector3;
+import de.beuth.raytracer.texture.SingleColorTexture;
 import de.beuth.raytracer.world.World;
 
 import javax.swing.*;
@@ -31,37 +32,37 @@ public class Exercise3Testing {
 
     public static final PerspectiveCamera camera = new PerspectiveCamera(new Point3(4, 4, 4), new Vector3(-1, -1, -1), new Vector3(0, 1, 0), (Math.PI / 4));
 
-    public static final Material single_material_plane = new SingleColorMaterial(new Color(1, 0, 0));
-    public static final Material single_material_sphere = new SingleColorMaterial(new Color(0, 1, 0));
-    public static final Material single_material_box = new SingleColorMaterial(new Color(0, 0, 1));
-    public static final Material single_material_triangle = new SingleColorMaterial(new Color(1, 1, 0));
+    public static final Material single_material_plane = new SingleColorMaterial(new SingleColorTexture(new Color(1, 0, 0)));
+    public static final Material single_material_sphere = new SingleColorMaterial(new SingleColorTexture(new Color(0, 1, 0)));
+    public static final Material single_material_box = new SingleColorMaterial(new SingleColorTexture(new Color(0, 0, 1)));
+    public static final Material single_material_triangle = new SingleColorMaterial(new SingleColorTexture(new Color(1, 1, 0)));
     public static final Plane plane = new Plane(new Point3(0,0,0), new Normal3(0, 1, 0), single_material_plane);
     public static final Sphere sphere = new Sphere(new Point3(1, 1, 1), 0.5, single_material_sphere);
     public static final AxisAlignedBox box = new AxisAlignedBox(new Point3(-1.5, 0.5, 0.5), new Point3(-0.5, 1.5, 1.5), single_material_box);
     public static final Triangle triangle = new Triangle(new Point3(0, 0, -1), new Point3(1, 0, -1), new Point3(1, 1, -1), new Normal3(0,0,1), new Normal3(0,0,1), new Normal3(0,0,1), single_material_triangle);
 
-    public static final Material lamber_material_plane = new LambertMaterial(new Color(1, 0, 0));
-    public static final Material lambert_material_sphere = new LambertMaterial(new Color(0, 1, 0));
-    public static final Material lambert_material_box = new LambertMaterial(new Color(0, 0, 1));
-    public static final Material lambert_material_triangle = new LambertMaterial(new Color(1, 1, 0));
+    public static final Material lamber_material_plane = new LambertMaterial(new SingleColorTexture(new Color(1, 0, 0)));
+    public static final Material lambert_material_sphere = new LambertMaterial(new SingleColorTexture(new Color(0, 1, 0)));
+    public static final Material lambert_material_box = new LambertMaterial(new SingleColorTexture(new Color(0, 0, 1)));
+    public static final Material lambert_material_triangle = new LambertMaterial(new SingleColorTexture(new Color(1, 1, 0)));
     public static final Plane plane2 = new Plane(new Point3(0,0,0), new Normal3(0, 1, 0), lamber_material_plane);
     public static final Sphere sphere2 = new Sphere(new Point3(1, 1, 1), 0.5, lambert_material_sphere);
     public static final AxisAlignedBox box2 = new AxisAlignedBox(new Point3(-1.5, 0.5, 0.5), new Point3(-0.5, 1.5, 1.5), lambert_material_box);
     public static final Triangle triangle2 = new Triangle(new Point3(0, 0, -1), new Point3(1, 0, -1), new Point3(1, 1, -1), new Normal3(0,0,1), new Normal3(0,0,1), new Normal3(0,0,1), lambert_material_triangle);
 
-    public static final Material Phong_material_plane = new PhongMaterial(new Color(1, 0, 0), new Color(1, 1, 1), 64);
-    public static final Material Phong_material_sphere = new PhongMaterial(new Color(0, 1, 0), new Color(1, 1, 1), 64);
-    public static final Material Phong_material_box = new PhongMaterial(new Color(0, 0, 1), new Color(1, 1, 1), 64);
-    public static final Material Phong_material_triangle = new PhongMaterial(new Color(1, 1, 0), new Color(1, 1, 1), 64);
+    public static final Material Phong_material_plane = new PhongMaterial(new SingleColorTexture(new Color(1, 0, 0)), new SingleColorTexture(new Color(1, 1, 1)), 64);
+    public static final Material Phong_material_sphere = new PhongMaterial(new SingleColorTexture(new Color(0, 1, 0)), new SingleColorTexture(new Color(1, 1, 1)), 64);
+    public static final Material Phong_material_box = new PhongMaterial(new SingleColorTexture(new Color(0, 0, 1)), new SingleColorTexture(new Color(1, 1, 1)), 64);
+    public static final Material Phong_material_triangle = new PhongMaterial(new SingleColorTexture(new Color(1, 1, 0)), new SingleColorTexture(new Color(1, 1, 1)), 64);
     public static final Plane plane3 = new Plane(new Point3(0,0,0), new Normal3(0, 1, 0), Phong_material_plane);
     public static final Sphere sphere3 = new Sphere(new Point3(1, 1, 1), 0.5, Phong_material_sphere);
     public static final AxisAlignedBox box3 = new AxisAlignedBox(new Point3(-1.5, 0.5, 0.5), new Point3(-0.5, 1.5, 1.5), Phong_material_box);
     public static final Triangle triangle3 = new Triangle(new Point3(0, 0, -1), new Point3(1, 0, -1), new Point3(1, 1, -1), new Normal3(0,0,1), new Normal3(0,0,1), new Normal3(0,0,1), Phong_material_triangle);
 
-    public static final Material BlinnPhong_material_plane = new BlinnPhongMaterial(new Color(1, 0, 0), new Color(1, 1, 1), 64);
-    public static final Material BlinnPhong_material_sphere = new BlinnPhongMaterial(new Color(0, 1, 0), new Color(1, 1, 1), 64);
-    public static final Material BlinnPhong_material_box = new BlinnPhongMaterial(new Color(0, 0, 1), new Color(1, 1, 1), 64);
-    public static final Material BlinnPhong_material_triangle = new BlinnPhongMaterial(new Color(1, 1, 0), new Color(1, 1, 1), 64);
+    public static final Material BlinnPhong_material_plane = new BlinnPhongMaterial(new SingleColorTexture(new Color(1, 0, 0)), new SingleColorTexture(new Color(1, 1, 1)), 64);
+    public static final Material BlinnPhong_material_sphere = new BlinnPhongMaterial(new SingleColorTexture(new Color(0, 1, 0)), new SingleColorTexture(new Color(1, 1, 1)), 64);
+    public static final Material BlinnPhong_material_box = new BlinnPhongMaterial(new SingleColorTexture(new Color(0, 0, 1)), new SingleColorTexture(new Color(1, 1, 1)), 64);
+    public static final Material BlinnPhong_material_triangle = new BlinnPhongMaterial(new SingleColorTexture(new Color(1, 1, 0)), new SingleColorTexture(new Color(1, 1, 1)), 64);
     public static final Plane plane4 = new Plane(new Point3(0,0,0), new Normal3(0, 1, 0), BlinnPhong_material_plane);
     public static final Sphere sphere4 = new Sphere(new Point3(1, 1, 1), 0.5, BlinnPhong_material_sphere);
     public static final AxisAlignedBox box4 = new AxisAlignedBox(new Point3(-1.5, 0.5, 0.5), new Point3(-0.5, 1.5, 1.5), BlinnPhong_material_box);

@@ -7,25 +7,24 @@ package de.beuth.raytracer.material;
 import de.beuth.raytracer.color.Color;
 import de.beuth.raytracer.geometry.Hit;
 import de.beuth.raytracer.light.Light;
+import de.beuth.raytracer.mathlibrary.Normal3;
 import de.beuth.raytracer.mathlibrary.Point3;
 import de.beuth.raytracer.mathlibrary.Vector3;
 import de.beuth.raytracer.texture.SingleColorTexture;
+import de.beuth.raytracer.texture.Texture;
 import de.beuth.raytracer.world.World;
 
-/**
- * describes a blinn phong material
- */
-public class BlinnPhongMaterial extends Material {
+public class OrenNayarMaterial extends Material {
 
     /**
      * the diffusing color
      */
-    public final SingleColorTexture diffuse;
+    public final Texture diffuse;
 
     /**
      * the specular color
      */
-    public final SingleColorTexture specular;
+    public final Texture specular;
 
     /**
      * the exponent
@@ -33,12 +32,11 @@ public class BlinnPhongMaterial extends Material {
     public final int exponent;
 
     /**
-     * instantiates a blinn phong material
-     * @param diffuse the diffusing color
-     * @param specular the specular color
+     * instanciates a new oren-nayar material
+     * @param diffuse color of the material
      * @param exponent the exponent
      */
-    public BlinnPhongMaterial(final SingleColorTexture diffuse, final SingleColorTexture specular, final int exponent) {
+    public OrenNayarMaterial(final Texture diffuse, final Texture specular, final int exponent) {
         this.diffuse = diffuse;
         this.specular = specular;
         this.exponent = exponent;
@@ -46,46 +44,40 @@ public class BlinnPhongMaterial extends Material {
 
     /**
      * this method returns the color for one Hit-Object
-     * @param hit the hit with an object
-     * @param world the world is needed to find the lights
+     *
+     * @param hit    the hit with an object
+     * @param world  the world is needed to find the lights
      * @param tracer function for raytracing
      * @return color for hit
      */
     @Override
     public Color colorFor(final Hit hit, final World world, final Tracer tracer) {
 
-        Point3 point = hit.r.at(hit.t);
+        final Color c = this.diffuse.getColor(hit.tc.u, hit.tc.v).mul(world.ambientLight);
 
-        Color color = world.ambientLight.mul(this.diffuse.color);
+        final Point3 pointHit = hit.r.at(hit.t);
+        final Vector3 viewVector = hit.r.d.mul(-1);
+
+        Color returnColorMultiplier = World.BACKGROUND_COLOR;
+        final double roughness = Math.pow(this.exponent, 2);
+        final double a = 1.0f - 0.5f * (roughness / (roughness + 0.57f));
+        final double b = 0.45f * (roughness / (roughness + 0.09f));
 
         for (Light light : world.ambientLights) {
-
-            Color lightColor = World.BACKGROUND_COLOR;
-
-            if (light.illuminates(hit.r.at(hit.t), world)) {
-
-                final Vector3 lightVector = light.directionFrom(point).normalized();
-
-                final Vector3 h = lightVector.add((hit.r.d.mul(-1)).normalized()).normalized();
-
-                final double NdotH = h.dot(hit.n);
-
-                final double maxNL = Math.max(0.0, lightVector.dot(hit.n));
-                final double maxER = Math.pow(Math.max(0.0, NdotH), this.exponent);
-
-                lightColor = lightColor.add(light.color.mul(this.diffuse.color).mul(maxNL)).add(light.color.mul(this.specular.color).mul(maxER));
-
+            if (light.illuminates(pointHit, world)) {
+                final Vector3 lightVector = light.directionFrom(pointHit).normalized();
+                final double alpha = Math.max(Math.acos(viewVector.dot(hit.n)), Math.acos(lightVector.dot(hit.n)));
+                final double beta = Math.min(Math.acos(viewVector.dot(hit.n)), Math.acos(viewVector.dot(hit.n)));
+                returnColorMultiplier = this.diffuse.getColor(hit.tc.u, hit.tc.v).mul(hit.n.dot(lightVector)).mul(a + b * Math.max(0, hit.n.dot(lightVector)) * Math.sin(alpha) * Math.tan(beta));
             }
-
-            color = color.add(lightColor);
         }
-        return color;
+
+        return c.add(returnColorMultiplier);
 
     }
 
     /**
      * converts any Material into a CelShadingMaterial
-     *
      * @return a new CelShadingMaterial
      */
     @Override
@@ -105,7 +97,7 @@ public class BlinnPhongMaterial extends Material {
 
     @Override
     public String toString() {
-        return "BlinnPhongMaterial{" +
+        return "OrenNayarMaterial{" +
                 "diffuse=" + diffuse +
                 ", specular=" + specular +
                 ", exponent=" + exponent +
@@ -121,7 +113,7 @@ public class BlinnPhongMaterial extends Material {
             return false;
         }
 
-        BlinnPhongMaterial that = (BlinnPhongMaterial) o;
+        OrenNayarMaterial that = (OrenNayarMaterial) o;
 
         if (exponent != that.exponent) {
             return false;

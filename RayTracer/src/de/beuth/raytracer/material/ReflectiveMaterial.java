@@ -11,6 +11,8 @@ import de.beuth.raytracer.light.Light;
 import de.beuth.raytracer.mathlibrary.Point3;
 import de.beuth.raytracer.mathlibrary.Ray;
 import de.beuth.raytracer.mathlibrary.Vector3;
+import de.beuth.raytracer.texture.SingleColorTexture;
+import de.beuth.raytracer.texture.Texture;
 import de.beuth.raytracer.world.World;
 
 /**
@@ -21,12 +23,12 @@ public class ReflectiveMaterial extends Material {
     /**
      * the diffusing color
      */
-    public final Color diffuse;
+    public final Texture diffuse;
 
     /**
      * the specular color
      */
-    public final Color specular;
+    public final Texture specular;
 
     /**
      * the exponent
@@ -36,7 +38,7 @@ public class ReflectiveMaterial extends Material {
     /**
      * the reflection color
      */
-    public final Color reflection;
+    public final Texture reflection;
 
     /**
      * creates an instance of a phong material
@@ -45,7 +47,7 @@ public class ReflectiveMaterial extends Material {
      * @param exponent the exponent
      * @param reflection the reflection of the material
      */
-    public ReflectiveMaterial(final Color diffuse, final Color specular, final int exponent, final Color reflection) {
+    public ReflectiveMaterial(final Texture diffuse, final Texture specular, final int exponent, final Texture reflection) {
         this.diffuse = diffuse;
         this.specular = specular;
         this.reflection = reflection;
@@ -60,7 +62,7 @@ public class ReflectiveMaterial extends Material {
      * @return color for hit
      */
     public Color colorFor(final Hit hit, final World world, final Tracer tracer) {
-        Color colorOfMaterial = world.ambientLight.mul(this.diffuse);
+        Color colorOfMaterial = world.ambientLight.mul(this.diffuse.getColor(hit.tc.u, hit.tc.v));
         final Point3 hitPoint = hit.r.at(hit.t);
         final double cosinusPhi = hit.n.dot(hit.r.d.mul(-1.0)) * 2;
         final Vector3 v = hit.r.d.mul(-1).normalized();
@@ -74,11 +76,11 @@ public class ReflectiveMaterial extends Material {
                 // if light illuminates hit point, there is need to calculate new xolor
                 double firstMaximum = Math.max(0.0, hit.n.dot(normalVector));
                 double secondMaximum = Math.pow(Math.max(0.0, reflectedVector.dot(v)), this.exponent);
-                colorOfMaterial = colorOfMaterial.add(currentLight.color.mul(this.diffuse).mul(firstMaximum)).add(currentLight.color.mul(this.specular).mul(secondMaximum));
+                colorOfMaterial = colorOfMaterial.add(currentLight.color.mul(this.diffuse.getColor(hit.tc.u, hit.tc.v)).mul(firstMaximum)).add(currentLight.color.mul(this.specular.getColor(hit.tc.u, hit.tc.v)).mul(secondMaximum));
             }
         }
         Color reflectedColor = tracer.colorFor(new Ray(hitPoint, hit.r.d.add(hit.n.mul(cosinusPhi))));
-        return colorOfMaterial.add(reflection.mul((reflectedColor)));
+        return colorOfMaterial.add(reflection.getColor(hit.tc.u, hit.tc.v).mul((reflectedColor)));
     }
 
     /**

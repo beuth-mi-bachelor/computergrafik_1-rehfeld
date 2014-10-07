@@ -69,7 +69,19 @@ public abstract class Camera {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public String toString() {
+        return "Camera{" +
+                "e=" + e +
+                ", g=" + g +
+                ", t=" + t +
+                ", u=" + u +
+                ", v=" + v +
+                ", w=" + w +
+                '}';
+    }
+
+    @Override
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
@@ -94,17 +106,5 @@ public abstract class Camera {
         result = 31 * result + (v != null ? v.hashCode() : 0);
         result = 31 * result + (w != null ? w.hashCode() : 0);
         return result;
-    }
-
-    @Override
-    public String toString() {
-        return "Camera{" +
-                "e=" + e +
-                ", g=" + g +
-                ", t=" + t +
-                ", u=" + u +
-                ", v=" + v +
-                ", w=" + w +
-                '}';
     }
 }

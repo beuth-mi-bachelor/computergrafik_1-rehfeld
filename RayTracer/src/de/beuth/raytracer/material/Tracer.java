@@ -41,34 +41,17 @@ public class Tracer {
      * @return the calculated color
      */
     public Color colorFor (final Ray r) {
-        /*this.refractionIndex--;
-
-        if (this.refractionIndex > 0) {
-
-            Hit hit = world.hit(r);
-
-            if (hit != null) {
-                Material material = hit.geo.material;
-                Color color = material.colorFor(hit, world, this);
-                this.refractionIndex++;
-                return color;
-            }
-        }
-        
-        this.refractionIndex++;
-
-        return World.BACKGROUND_COLOR;*/
         if (r == null) {
             throw new IllegalArgumentException("The ray cannot be null!");
         }
-        if(refractionIndex <= 0){
-            return world.BACKGROUND_COLOR;
-        }else{
+        if (refractionIndex <= 0) {
+            return World.BACKGROUND_COLOR;
+        } else{
             Hit hit = world.hit(r);
-            if(hit != null ){
+            if (hit != null) {
                 return hit.geo.material.colorFor(hit, world, new Tracer(world, refractionIndex-1));
-            }else{
-                return world.BACKGROUND_COLOR;
+            } else{
+                return World.BACKGROUND_COLOR;
             }
         }
     }

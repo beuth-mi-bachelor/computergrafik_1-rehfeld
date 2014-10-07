@@ -4,12 +4,11 @@
 
 package de.beuth.raytracer.geometry;
 
-import de.beuth.raytracer.color.Color;
 import de.beuth.raytracer.material.Material;
-import de.beuth.raytracer.material.SingleColorMaterial;
 import de.beuth.raytracer.mathlibrary.Normal3;
 import de.beuth.raytracer.mathlibrary.Point3;
 import de.beuth.raytracer.mathlibrary.Ray;
+import de.beuth.raytracer.mathlibrary.Transform;
 
 import java.util.ArrayList;
 
@@ -28,6 +27,13 @@ public class AxisAlignedBox extends Geometry {
      */
     public final Point3 run;
 
+    private Node right;
+    private Node top;
+    private Node front;
+    private Node left;
+    private Node bottom;
+    private Node back;
+
     /**
      * defines a axis aligned box
      * @param lbf point
@@ -38,7 +44,38 @@ public class AxisAlignedBox extends Geometry {
         super(material);
         this.lbf = lbf;
         this.run = run;
+
+        ArrayList<Geometry> geos = new ArrayList<Geometry>();
+        geos.add(new Plane(new Point3(0, 0, 0), new Normal3(0, 1, 0), material));
+        left = new Node(new Transform().translate(this.lbf.x, this.lbf.y, this.lbf.z).rotateZ(Math.PI/2), geos, this.material);
+        bottom =  new Node(new Transform().translate(this.lbf.x, this.lbf.y, this.lbf.z).rotateX(Math.PI), geos, this.material);
+        back = new Node(new Transform().translate(this.lbf.x, this.lbf.y, this.lbf.z).rotateZ(Math.PI).rotateX(-Math.PI/2), geos, this.material);
+        right = new Node(new Transform().translate(this.run.x, this.run.y, this.run.z).rotateZ(-Math.PI/2), geos, this.material);
+        top =  new Node(new Transform().translate(this.run.x, this.run.y, this.run.z), geos, this.material);
+        front = new Node(new Transform().translate(this.run.x, this.run.y, this.run.z).rotateZ(Math.PI).rotateX(Math.PI/2), geos, this.material);
+
     }
+
+    /**
+     * defines a axis aligned box
+     * @param material material
+     */
+    public AxisAlignedBox(final Material material) {
+        super(material);
+        this.lbf = new Point3(-0.5, -0.5, -0.5);
+        this.run = new Point3(0.5, 0.5, 0.5);
+
+        ArrayList<Geometry> geos = new ArrayList<Geometry>();
+        geos.add(new Plane(new Point3(0, 0, 0), new Normal3(0, 1, 0), material));
+        left = new Node(new Transform().translate(this.lbf.x, this.lbf.y, this.lbf.z).rotateZ(Math.PI/2), geos, this.material);
+        bottom =  new Node(new Transform().translate(this.lbf.x, this.lbf.y, this.lbf.z).rotateX(Math.PI), geos, this.material);
+        back = new Node(new Transform().translate(this.lbf.x, this.lbf.y, this.lbf.z).rotateZ(Math.PI).rotateX(-Math.PI/2), geos, this.material);
+        right = new Node(new Transform().translate(this.run.x, this.run.y, this.run.z).rotateZ(-Math.PI/2), geos, this.material);
+        top =  new Node(new Transform().translate(this.run.x, this.run.y, this.run.z), geos, this.material);
+        front = new Node(new Transform().translate(this.run.x, this.run.y, this.run.z).rotateZ(Math.PI).rotateX(Math.PI/2), geos, this.material);
+
+    }
+
 
     /**
      * looks for a hit between a ray and a axis aligned box
@@ -48,60 +85,38 @@ public class AxisAlignedBox extends Geometry {
     @Override
     public Hit hit(final Ray r) {
 
-        // new planes as surfaces of box
-        final Plane left = new Plane(lbf, new Normal3(-1, 0, 0), new SingleColorMaterial(new Color(0, 0, 1)));
-        final Plane bottom = new Plane(lbf, new Normal3(0, -1, 0), new SingleColorMaterial(new Color(0, 1, 0)));
-        final Plane back = new Plane(lbf, new Normal3(0, 0, -1), new SingleColorMaterial(new Color(0, 0, 1)));
-        final Plane right = new Plane(run, new Normal3(1, 0, 0), new SingleColorMaterial(new Color(0, 1, 0)));
-        final Plane top = new Plane(run, new Normal3(0, 1, 0), new SingleColorMaterial(new Color(0, 0, 1)));
-        final Plane front = new Plane(run, new Normal3(0, 0, 1), new SingleColorMaterial(new Color(1, 0, 0)));
-
         // proof if planes are hit by ray
         final ArrayList<Hit> hits = new ArrayList<Hit>();
-            if (left.hit(r) != null) {
-                hits.add(left.hit(r));
-            }
-        if (bottom.hit(r) != null) {
-            hits.add(bottom.hit(r));
-        }
-        if (back.hit(r) != null) {
-            hits.add(back.hit(r));
-        }
-        if (right.hit(r) != null) {
-            hits.add(right.hit(r));
-        }
-        if (top.hit(r) != null) {
-            hits.add(top.hit(r));
-        }
-        if (front.hit(r) != null) {
-            hits.add(front.hit(r));
-        }
+        final Hit[] planeHits1 = new Hit[] {left.hit(r), right.hit(r)};
+        final Hit[] planeHits2 = new Hit[] {top.hit(r), bottom.hit(r)};
+        final Hit[] planeHits3 = new Hit[] {front.hit(r), back.hit(r)};
 
-        // proof which hits are in the box
-        final ArrayList<Hit> hitsInside = new ArrayList<Hit>();
-        for (final Hit h : hits) {
-            final double x = h.r.at(h.t).x;
-            final double y = h.r.at(h.t).y;
-            final double z = h.r.at(h.t).z;
-            final Normal3 normal = h.n;
-            if (h.geo.equals(left) || h.geo.equals(right)) {
-                if (lbf.y <= y && y <= run.y && lbf.z <= z && z <= run.z) {
-                    hitsInside.add(new Hit(h.t, r, this, normal));
+        for (Hit hit : planeHits1) {
+            if (hit != null) {
+                Point3 p = r.at(hit.t);
+                if (p.y >= lbf.y && p.y <= run.y && p.z >= lbf.z && p.z <= run.z) {
+                    hits.add(hit);
                 }
             }
-            if (h.geo.equals(top) || h.geo.equals(bottom)) {
-                if (lbf.x <= x && x <= run.x && lbf.z <= z && z <= run.z) {
-                    hitsInside.add(new Hit(h.t, r, this, normal));
+        }
+        for (Hit hit : planeHits2) {
+            if (hit != null) {
+                Point3 p = r.at(hit.t);
+                if (p.x >= lbf.x && p.x <= run.x && p.z >= lbf.z && p.z <= run.z) {
+                    hits.add(hit);
                 }
             }
-            if (h.geo.equals(front) || h.geo.equals(back)) {
-                if (lbf.x <= x && x <= run.x && lbf.y <= y && y <= run.y) {
-                    hitsInside.add(new Hit(h.t, r, this, normal));
+        }
+        for (Hit hit : planeHits3) {
+            if (hit != null) {
+                Point3 p = r.at(hit.t);
+                if (p.x >= lbf.x && p.x <= run.x && p.y >= lbf.y && p.y <= run.y) {
+                    hits.add(hit);
                 }
             }
         }
         Hit hit = null;
-        for (final Hit h : hitsInside) {
+        for (final Hit h : hits) {
             if (hit == null || h.t < hit.t) {
                 hit = h;
             }
@@ -116,7 +131,7 @@ public class AxisAlignedBox extends Geometry {
      */
     @Override
     public Geometry convertToSingleColorMaterial() {
-        return new AxisAlignedBox(this.lbf, this.run, this.material.convertToSingelColorMaterial());
+        return new AxisAlignedBox(this.material.convertToSingelColorMaterial());
     }
 
     /**
@@ -126,46 +141,7 @@ public class AxisAlignedBox extends Geometry {
      */
     @Override
     public Geometry convertToCelShadingMaterial() {
-        return new AxisAlignedBox(this.lbf, this.run, this.material.convertToCelShadingMaterial());
-    }
-
-    private Normal3 getNormalOfSite(final int inBetween) {
-        switch (inBetween) {
-            case 0:
-                return (new Normal3(1.0, 0.0, 0.0));
-            case 1:
-                return (new Normal3(0.0, 1.0, 0.0));
-            case 2:
-                return (new Normal3(0.0, 0.0, 1.0));
-            case 3:
-                return (new Normal3(1.0, 0.0, 0.0));
-            case 4:
-                return (new Normal3(0.0, 1.0, 0.0));
-            case 5:
-                return (new Normal3(0.0, 0.0, 1.0));
-            default:
-                return (null);
-        }
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        AxisAlignedBox that = (AxisAlignedBox) o;
-
-        if (lbf != null ? !lbf.equals(that.lbf) : that.lbf != null) return false;
-        if (run != null ? !run.equals(that.run) : that.run != null) return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = lbf != null ? lbf.hashCode() : 0;
-        result = 31 * result + (run != null ? run.hashCode() : 0);
-        return result;
+        return new AxisAlignedBox(this.material.convertToCelShadingMaterial());
     }
 
     @Override
@@ -173,6 +149,68 @@ public class AxisAlignedBox extends Geometry {
         return "AxisAlignedBox{" +
                 "lbf=" + lbf +
                 ", run=" + run +
+                ", right=" + right +
+                ", top=" + top +
+                ", front=" + front +
+                ", left=" + left +
+                ", bottom=" + bottom +
+                ", back=" + back +
                 '}';
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        AxisAlignedBox that = (AxisAlignedBox) o;
+
+        if (back != null ? !back.equals(that.back) : that.back != null) {
+            return false;
+        }
+        if (bottom != null ? !bottom.equals(that.bottom) : that.bottom != null) {
+            return false;
+        }
+        if (front != null ? !front.equals(that.front) : that.front != null) {
+            return false;
+        }
+        if (lbf != null ? !lbf.equals(that.lbf) : that.lbf != null) {
+            return false;
+        }
+        if (left != null ? !left.equals(that.left) : that.left != null) {
+            return false;
+        }
+        if (right != null ? !right.equals(that.right) : that.right != null) {
+            return false;
+        }
+        if (run != null ? !run.equals(that.run) : that.run != null) {
+            return false;
+        }
+        if (top != null ? !top.equals(that.top) : that.top != null) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (lbf != null ? lbf.hashCode() : 0);
+        result = 31 * result + (run != null ? run.hashCode() : 0);
+        result = 31 * result + (right != null ? right.hashCode() : 0);
+        result = 31 * result + (top != null ? top.hashCode() : 0);
+        result = 31 * result + (front != null ? front.hashCode() : 0);
+        result = 31 * result + (left != null ? left.hashCode() : 0);
+        result = 31 * result + (bottom != null ? bottom.hashCode() : 0);
+        result = 31 * result + (back != null ? back.hashCode() : 0);
+        return result;
     }
 }

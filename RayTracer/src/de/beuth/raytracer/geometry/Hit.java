@@ -6,6 +6,7 @@ package de.beuth.raytracer.geometry;
 
 import de.beuth.raytracer.mathlibrary.Normal3;
 import de.beuth.raytracer.mathlibrary.Ray;
+import de.beuth.raytracer.texture.TexCoord2;
 
 /**
  * class displays a hit between two objects
@@ -33,6 +34,11 @@ public class Hit {
     public final Normal3 n;
 
     /**
+     * the texture coordinates
+     */
+    public final TexCoord2 tc;
+
+    /**
      * displays a  hit between two objects
      *
      * @param t   where do they hit
@@ -40,11 +46,12 @@ public class Hit {
      * @param geo the geometry hit with
      * @param n   normal of the hitpoint
      */
-    public Hit(final double t, final Ray r, final Geometry geo, final Normal3 n) {
+    public Hit(final double t, final Ray r, final Geometry geo, final Normal3 n, final TexCoord2 tc) {
         this.t = t;
         this.r = r;
         this.geo = geo;
         this.n = n;
+        this.tc = tc;
     }
 
     @Override

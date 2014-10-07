@@ -4,10 +4,7 @@
 
 package de.beuth.raytracer.application;
 
-import de.beuth.raytracer.testing.Exercise1Testing;
-import de.beuth.raytracer.testing.Exercise2Testing;
-import de.beuth.raytracer.testing.Exercise3Testing;
-import de.beuth.raytracer.testing.Exercise4Testing;
+import de.beuth.raytracer.testing.*;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -18,6 +15,7 @@ import java.io.IOException;
 
 public class MenuBar extends JMenuBar implements ActionListener {
 
+    public final static int HEIGHT = 30;
     private RayTracer raytracer;
 
     public static String[] mainMenuItemNames = {
@@ -35,7 +33,9 @@ public class MenuBar extends JMenuBar implements ActionListener {
                     "Meilenstein 1",
                     "Meilenstein 2",
                     "Meilenstein 3",
-                    "Meilenstein 4"
+                    "Meilenstein 4",
+                    "Meilenstein 5",
+                    "Meilenstein 6"
             },
             {
                     "Kantendetektion",
@@ -56,8 +56,7 @@ public class MenuBar extends JMenuBar implements ActionListener {
                     "MS2 Demo-Szene 3",
                     "MS2 Demo-Szene 4",
                     "MS2 Demo-Szene 5",
-                    "MS2 Demo-Szene 6",
-                    "MS2 Demo-Szene 7"
+                    "MS2 Demo-Szene 6"
             },
             {
                     "MS3 Alle",
@@ -75,12 +74,39 @@ public class MenuBar extends JMenuBar implements ActionListener {
                     "MS4 Demo-Szene 1",
                     "MS4 Demo-Szene 2",
                     "MS4 Demo-Szene 3"
+            },
+            {
+                    "MS5 Alle",
+                    "MS5 Demo-Szene 1 & 2",
+                    "MS5 Alle Cubics",
+                    "MS5 Demo-Szene 1",
+                    "MS5 Demo-Szene 2",
+                    "MS5 Demo-Szene Teddy",
+                    "MS5 Demo-Szene Bunny",
+                    "MS5 Demo-Szene Cube v",
+                    "MS5 Demo-Szene Cube v blocks",
+                    "MS5 Demo-Szene Cube v blocks weird indices",
+                    "MS5 Demo-Szene Cube v vn",
+                    "MS5 Demo-Szene Cube v vt",
+                    "MS5 Demo-Szene Cube v vn vt",
+                    "MS5 Demo-Szene Cube v vn vt comments",
+                    "MS5 Demo-Szene Oren-Nayar Material"
+            },
+            {
+                    "MS6 Alle",
+                    "MS6 Earth Day ImageTexture",
+                    "MS6 Earth Night ImageTexture",
+                    "MS6 Earth Day InterpolatedImageTexture",
+                    "MS6 Earth Night InterpolatedImageTexture",
+                    "MS6 Own Demo Scene",
+                    "MS6 Changing Material"
             }
     };
 
 
     public MenuBar(RayTracer raytracer) {
         this.raytracer = raytracer;
+        this.setSize(RayTracer.WIDTH, HEIGHT);
         for (int i = 0; i < mainMenuItemNames.length; i++) {
             JMenu menu = new JMenu(mainMenuItemNames[i]);
             for (int j = 0; j < subMenuItemNames[i].length; j++) {
@@ -147,6 +173,12 @@ public class MenuBar extends JMenuBar implements ActionListener {
         if (e.getActionCommand().equals(subSubMenuItemNames[3][0])) {
             Exercise4Testing.all();
         }
+        if (e.getActionCommand().equals(subSubMenuItemNames[4][0])) {
+            Exercise5Testing.all();
+        }
+        if (e.getActionCommand().equals(subSubMenuItemNames[5][0])) {
+            Exercise6Testing.all();
+        }
 
         if (e.getActionCommand().equals(subSubMenuItemNames[0][1])) {
             Exercise1Testing.runExample1();
@@ -170,10 +202,6 @@ public class MenuBar extends JMenuBar implements ActionListener {
         if (e.getActionCommand().equals(subSubMenuItemNames[1][6])) {
             Exercise2Testing.runEx6();
         }
-        if (e.getActionCommand().equals(subSubMenuItemNames[1][7])) {
-            Exercise2Testing.runEx7();
-        }
-
         if (e.getActionCommand().equals(subSubMenuItemNames[2][1])) {
             Exercise3Testing.runExample3();
         }
@@ -209,6 +237,66 @@ public class MenuBar extends JMenuBar implements ActionListener {
             Exercise4Testing.runExample3();
         }
 
+        if (e.getActionCommand().equals(subSubMenuItemNames[4][1])) {
+            Exercise5Testing.renderScenesOnly();
+        }
+        if (e.getActionCommand().equals(subSubMenuItemNames[4][2])) {
+            Exercise5Testing.renderCubicsOnly();
+        }
+        if (e.getActionCommand().equals(subSubMenuItemNames[4][3])) {
+            Exercise5Testing.runExample1();
+        }
+        if (e.getActionCommand().equals(subSubMenuItemNames[4][4])) {
+            Exercise5Testing.runExample2();
+        }
+        if (e.getActionCommand().equals(subSubMenuItemNames[4][5])) {
+            Exercise5Testing.runExample3(Exercise5Testing.teddy);
+        }
+        if (e.getActionCommand().equals(subSubMenuItemNames[4][6])) {
+            Exercise5Testing.runExample3(Exercise5Testing.bunny);
+        }
+        if (e.getActionCommand().equals(subSubMenuItemNames[4][7])) {
+            Exercise5Testing.runExample3(Exercise5Testing.cube_v);
+        }
+        if (e.getActionCommand().equals(subSubMenuItemNames[4][8])) {
+            Exercise5Testing.runExample3(Exercise5Testing.cube_v_blocks);
+        }
+        if (e.getActionCommand().equals(subSubMenuItemNames[4][9])) {
+            Exercise5Testing.runExample3(Exercise5Testing.cube_v_blocks_weird_indices);
+        }
+        if (e.getActionCommand().equals(subSubMenuItemNames[4][10])) {
+            Exercise5Testing.runExample3(Exercise5Testing.cube_v_vn);
+        }
+        if (e.getActionCommand().equals(subSubMenuItemNames[4][11])) {
+            Exercise5Testing.runExample3(Exercise5Testing.cube_v_vt);
+        }
+        if (e.getActionCommand().equals(subSubMenuItemNames[4][12])) {
+            Exercise5Testing.runExample3(Exercise5Testing.cube_v_vt_vn);
+        }
+        if (e.getActionCommand().equals(subSubMenuItemNames[4][13])) {
+            Exercise5Testing.runExample3(Exercise5Testing.cube_v_vt_vn_comments);
+        }
+        if (e.getActionCommand().equals(subSubMenuItemNames[4][14])) {
+            Exercise5Testing.runExample4();
+        }
+        if (e.getActionCommand().equals(subSubMenuItemNames[5][1])) {
+            Exercise6Testing.runEasyEarthDay();
+        }
+        if (e.getActionCommand().equals(subSubMenuItemNames[5][2])) {
+            Exercise6Testing.runEasyEarthNight();
+        }
+        if (e.getActionCommand().equals(subSubMenuItemNames[5][3])) {
+            Exercise6Testing.runInterpolatedEarthDay();
+        }
+        if (e.getActionCommand().equals(subSubMenuItemNames[5][4])) {
+            Exercise6Testing.runInterpolatedEarthNight();
+        }
+        if (e.getActionCommand().equals(subSubMenuItemNames[5][5])) {
+            Exercise6Testing.runOwnDemoScene();
+        }
+        if (e.getActionCommand().equals(subSubMenuItemNames[5][6])) {
+            Exercise6Testing.runChangingMaterial();
+        }
 
         /**
          * If save is clicked

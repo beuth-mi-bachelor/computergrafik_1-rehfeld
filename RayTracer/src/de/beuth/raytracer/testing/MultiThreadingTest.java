@@ -12,7 +12,10 @@ import de.beuth.raytracer.light.DirectionalLight;
 import de.beuth.raytracer.light.Light;
 import de.beuth.raytracer.light.PointLight;
 import de.beuth.raytracer.light.SpotLight;
-import de.beuth.raytracer.material.*;
+import de.beuth.raytracer.material.Material;
+import de.beuth.raytracer.material.PhongMaterial;
+import de.beuth.raytracer.material.ReflectiveMaterial;
+import de.beuth.raytracer.material.TransparentMaterial;
 import de.beuth.raytracer.mathlibrary.Normal3;
 import de.beuth.raytracer.mathlibrary.Point3;
 import de.beuth.raytracer.mathlibrary.Vector3;
@@ -22,70 +25,13 @@ import de.beuth.raytracer.world.World;
 import javax.swing.*;
 import java.util.ArrayList;
 
-/**
- * this is the test-class
- */
-public class Exercise4Testing {
+public class MultiThreadingTest {
 
-    public static final Color ambientLight = new Color(0.25, 0.25, 0.25);
-    public static final PerspectiveCamera camera = new PerspectiveCamera(new Point3(8, 8, 8), new Vector3(-1, -1, -1), new Vector3(0, 1, 0), (Math.PI / 4));
+    public static final String baseURL = "src/de/beuth/raytracer/models/";
+    public static final String teddy = baseURL + "teddy.obj";
 
-    public static void all() {
-        runExample1();
-        runExample2();
-        runExample3();
-    }
+    public static void runExample1(final Integer procs) {
 
-    public static void runExample1() {
-        ArrayList<Geometry> geoList = new ArrayList<Geometry>();
-        Material reflective_material_plane = new ReflectiveMaterial(new SingleColorTexture(new Color(0.1, 0.1, 0.1)), new SingleColorTexture(new Color(0, 0, 0)), 64, new SingleColorTexture(new Color(0.5, 0.5, 0.5)));
-        Plane plane = new Plane(new Point3(0, 0, 0), new Normal3(0, 1, 0), reflective_material_plane);
-
-        Material reflective_material_sphere1 = new ReflectiveMaterial(new SingleColorTexture(new Color(1, 0, 0)), new SingleColorTexture(new Color(1, 1, 1)), 64, new SingleColorTexture(new Color(0.5, 0.5, 0.5)));
-        Sphere sphere1 = new Sphere(new Point3(-3, 1, 0), 1, reflective_material_sphere1);
-
-        Material reflective_material_sphere2 = new ReflectiveMaterial(new SingleColorTexture(new Color(0, 1, 0)), new SingleColorTexture(new Color(1, 1, 1)), 64, new SingleColorTexture(new Color(0.5, 0.5, 0.5)));
-        Sphere sphere2 = new Sphere(new Point3(0, 1, 0), 1, reflective_material_sphere2);
-
-        Material reflective_material_sphere3 = new ReflectiveMaterial(new SingleColorTexture(new Color(0, 0, 1)), new SingleColorTexture(new Color(1, 1, 1)), 64, new SingleColorTexture(new Color(0.5, 0.5, 0.5)));
-        Sphere sphere3 = new Sphere(new Point3(3, 1, 0), 1, reflective_material_sphere3);
-
-        geoList.add(plane);
-        geoList.add(sphere1);
-        geoList.add(sphere2);
-        geoList.add(sphere3);
-
-        PointLight light = new PointLight(new Color(1, 1, 1), new Point3(8, 8, 8), true);
-        ArrayList<Light> lights = new ArrayList<Light>();
-        lights.add(light);
-
-        World world = new World(geoList,lights, Exercise4Testing.ambientLight, 0);
-
-        new RayTracer(world, Exercise4Testing.camera);
-    }
-
-    public static void runExample2() {
-        ArrayList<Geometry> geoList = new ArrayList<Geometry>();
-
-        Material lambert_material_plane = new LambertMaterial(new SingleColorTexture(new Color(0.8, 0.8, 0.8)));
-        Plane plane = new Plane(new Point3(0, 0, 0), new Normal3(0, 1, 0), lambert_material_plane);
-
-        Material lambert_material_box = new LambertMaterial(new SingleColorTexture(new Color(1, 0, 0)));
-        AxisAlignedBox box = new AxisAlignedBox(new Point3(-0.5, 0, -0.5), new Point3(0.5, 1, 0.5), lambert_material_box);
-
-        geoList.add(plane);
-        geoList.add(box);
-
-        PointLight light = new PointLight(new Color(1, 1, 1), new Point3(8, 8, 0), true);
-        ArrayList<Light> lights = new ArrayList<Light>();
-        lights.add(light);
-
-        World world = new World(geoList,lights, Exercise4Testing.ambientLight, 0);
-
-        new RayTracer(world, Exercise4Testing.camera);
-    }
-
-    public static void runExample3() {
         ArrayList<Geometry> geoList = new ArrayList<Geometry>();
         Material reflective_material_plane = new ReflectiveMaterial(new SingleColorTexture(new Color(1, 1, 1)), new SingleColorTexture(new Color(1, 1, 1)), 10, new SingleColorTexture(new Color(1, 1, 1)));
         Plane plane = new Plane(new Point3(0, 0, 0), new Normal3(0, 1, 0), reflective_material_plane);
@@ -135,14 +81,58 @@ public class Exercise4Testing {
 
         World world = new World(geoList,lights, new Color(0.1, 0.1, 0.1), 1);
 
-        new RayTracer(world, Exercise4Testing.camera);
+        new RayTracer(world, Exercise4Testing.camera, procs);
+
+
     }
+
+    public static void runExample2(final Integer procs) {
+        ArrayList<Geometry> geoList = new ArrayList<Geometry>();
+        geoList.add(Exercise3Testing.plane);
+        geoList.add(Exercise3Testing.sphere);
+        geoList.add(Exercise3Testing.box);
+        geoList.add(Exercise3Testing.triangle);
+        PointLight light = new PointLight(new Color(1,1,1), new Point3(4,4,4), false);
+        ArrayList<Light> lights = new ArrayList<Light>();
+        lights.add(light);
+        World world = new World(geoList,lights, Exercise3Testing.ambientLight, 0);
+        new RayTracer(world, Exercise3Testing.camera, procs);
+    }
+
+    public static void runExample3(final Integer procs) {
+        String toRender = teddy;
+        ArrayList<Geometry> geoList = new ArrayList<Geometry>();
+        ArrayList<Light> lights = new ArrayList<Light>();
+
+        ShapeFromFile test = new ShapeFromFile(toRender, new PhongMaterial(new SingleColorTexture(new Color(1, 1, 1)), new SingleColorTexture(new Color(1, 1, 1)), 64));
+        Node testnode = test.OBJLoader();
+        PerspectiveCamera cam;
+        Light light;
+
+        cam = new PerspectiveCamera(new Point3(2, 2, 2), new Vector3(-1, -1, -1), new Vector3(0, 1, 0), Math.PI/4);
+
+        light = new DirectionalLight(new Color(1, 1, 1), new Vector3(0.5, 1, 1), false);
+
+        lights.add(light);
+        geoList.add(testnode);
+        World world;
+
+        world = new World(geoList, lights, new Color(0, 0, 0), 1);
+
+        new RayTracer(world, cam, procs);
+    }
+
 
     public static void main(String args[]) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                Exercise4Testing.all();
+                for (int i = 1; i <= Runtime.getRuntime().availableProcessors(); i++) {
+                    MultiThreadingTest.runExample1(i);
+                    MultiThreadingTest.runExample2(i);
+                    MultiThreadingTest.runExample3(i);
+                }
+
             }
         });
     }

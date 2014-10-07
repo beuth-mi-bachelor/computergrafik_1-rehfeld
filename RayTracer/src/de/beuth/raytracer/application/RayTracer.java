@@ -16,7 +16,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
+import java.text.DateFormat;
+import java.util.*;
 
 
 public class RayTracer extends JFrame {
@@ -34,42 +35,92 @@ public class RayTracer extends JFrame {
      */
     private ImageMaker imageContainer;
 
-    public RayTracer(World world, Camera camera) {
-        this.doPreWindowOperations();
-        this.imageContainer = new ImageMaker(this, world, camera);
-        this.doPostWindowOperations();
-    }
+    public StatusBar statusBar;
+
+    private Long started;
+    private Long ended;
 
     public RayTracer() {
-        this.doPreWindowOperations();
-        final OrthographicCamera camera = new OrthographicCamera(new Point3(0, 0, 0), new Vector3(0, 0, 0), new Vector3(0, 0, 0), 0);
-        final World world = new World(new ArrayList<Geometry>(), new ArrayList<Light>(), new Color(0, 0, 0), 0);
-        this.imageContainer = new ImageMaker(this, world, camera);
+        this.doPreWindowOperations(null);
         this.doPostWindowOperations();
     }
 
-    private void doPreWindowOperations() {
+    public RayTracer(World world, Camera camera) {
+        this.doPreWindowOperations(null);
+        this.imageContainer = new ImageMaker(world, camera);
+        this.doPostWindowOperations();
+    }
+
+    public RayTracer(World world, Camera camera, final Integer processors) {
+        this.doPreWindowOperations(processors);
+        this.imageContainer = new ImageMaker(world, camera, processors);
+        this.doPostWindowOperations();
+    }
+
+    private void doPreWindowOperations(final Integer processors) {
         /**
          * Set width and height of window
          */
-        this.setSize(new Dimension(WIDTH, HEIGHT));
+        //this.setSize(new Dimension(WIDTH, HEIGHT));
+        this.getContentPane().setPreferredSize(new Dimension(WIDTH, HEIGHT+StatusBar.HEIGHT+MenuBar.HEIGHT));
+        this.pack();
         this.centerWindow();
+
+        if (processors != null) {
+            this.setTitle("RayTracer | processors in use: " + processors);
+        } else {
+            this.setTitle("RayTracer");
+        }
 
         /**
          * Creates the menü
          */
-        MenuBar menu = new MenuBar(this);
+        final MenuBar menu = new MenuBar(this);
         this.setJMenuBar(menu);
+
+        this.statusBar = new StatusBar();
+        this.add(this.statusBar, java.awt.BorderLayout.SOUTH);
     }
 
     private void doPostWindowOperations() {
         /**
          * Add this frame to the window
          */
-        this.add(this.imageContainer);
+        if (this.imageContainer != null) {
+            this.add(this.imageContainer);
+        }
         this.addWindowListener(listener);
+
+        this.started = System.nanoTime();
+        DateFormat df;
+        df = DateFormat.getTimeInstance(DateFormat.MEDIUM);
+        this.statusBar.setMessage("started at: " + df.format(new Date(started)) + " | calculating...");
         this.setVisible(true);
 
+        this.paint(this.getGraphics());
+
+        if (this.imageContainer != null) {
+            this.imageContainer.makeImage();
+        }
+
+        this.ended = System.nanoTime();
+
+        Long diff = (this.ended - this.started) / 1000000000;
+
+        int minutes = Math.round(diff / 60);
+        int seconds = Math.round(diff % 60);
+
+        this.statusBar.setMessage("calculation time: " + df.format(new Date(ended)) + " | finished in " + fillWithZeros(minutes, 2) + ":" + fillWithZeros(seconds, 2) + " minutes");
+
+        this.repaint();
+    }
+
+    public String fillWithZeros(int val, int len) {
+        String str = Integer.toString(val);
+        while (str.length() < len) {
+            str = "0" + str;
+        }
+        return str;
     }
 
     private WindowListener listener = new WindowListener() {
@@ -100,10 +151,7 @@ public class RayTracer extends JFrame {
      * centers the window on screen
      */
     private void centerWindow() {
-        Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-        int X = (screen.width / 2) - (RayTracer.WIDTH / 2);
-        int Y = (screen.height / 2) - (RayTracer.HEIGHT / 2);
-        this.setBounds(X, Y, RayTracer.WIDTH, RayTracer.HEIGHT);
+        this.setLocationRelativeTo(null);
     }
 
     public ImageMaker getImageContainer() {

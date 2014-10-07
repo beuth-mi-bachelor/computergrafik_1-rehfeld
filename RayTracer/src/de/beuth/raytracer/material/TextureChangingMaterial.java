@@ -10,26 +10,28 @@ import de.beuth.raytracer.light.Light;
 import de.beuth.raytracer.mathlibrary.Normal3;
 import de.beuth.raytracer.mathlibrary.Point3;
 import de.beuth.raytracer.mathlibrary.Vector3;
-import de.beuth.raytracer.texture.SingleColorTexture;
 import de.beuth.raytracer.texture.Texture;
 import de.beuth.raytracer.world.World;
 
 /**
- * describes a lambert material
+ * describes a texture changing material
  */
-public class LambertMaterial extends Material {
+public class TextureChangingMaterial extends Material {
 
     /**
      * the Color attribute
      */
-    public final Texture texture;
+    public final Texture texture1;
+    public final Texture texture2;
 
     /**
-     * creates an instance of a lambert material
-     * @param texture the color of the material
+     * creates an instance of a texture changing  material
+     * @param texture1 the color of the material
+     * @param texture2 the color of the material
      */
-    public LambertMaterial(final Texture texture) {
-        this.texture = texture;
+    public TextureChangingMaterial(final Texture texture1, final Texture texture2) {
+        this.texture1 = texture1;
+        this.texture2 = texture2;
     }
 
     /**
@@ -40,24 +42,15 @@ public class LambertMaterial extends Material {
      * @return the color for a hitpoint
      */
     public Color colorFor(final Hit hit, final World world, final Tracer tracer) {
-
-        Normal3 hitNormal = hit.n;
-        Color c = this.texture.getColor(hit.tc.u, hit.tc.v).mul(world.ambientLight);
-
         Point3 pointHit = hit.r.at(hit.t);
         for (Light light : world.ambientLights) {
-            Color lightColor = light.color;
-
             if (light.illuminates(pointHit, world)) {
-                Vector3 l = light.directionFrom(pointHit).normalized();
-                double max = Math.max(0.0, l.dot(hitNormal));
-
-                c = c.add(this.texture.getColor(hit.tc.u, hit.tc.v).mul(lightColor).mul(max));
-
+                return this.texture1.getColor(hit.tc.u, hit.tc.v);
+            } else {
+                return this.texture2.getColor(hit.tc.u, hit.tc.v);
             }
         }
-
-        return c;
+        return this.texture1.getColor(hit.tc.u, hit.tc.v);
     }
 
     /**
@@ -67,7 +60,7 @@ public class LambertMaterial extends Material {
      */
     @Override
     public CelShadingMaterial convertToCelShadingMaterial() {
-        return new CelShadingMaterial(this.texture);
+        return new CelShadingMaterial(this.texture1);
     }
 
     /**
@@ -77,13 +70,14 @@ public class LambertMaterial extends Material {
      */
     @Override
     public SingleColorMaterial convertToSingelColorMaterial() {
-        return new SingleColorMaterial(this.texture);
+        return new SingleColorMaterial(this.texture1);
     }
 
     @Override
     public String toString() {
-        return "LambertMaterial{" +
-                "texture=" + texture +
+        return "TextureChangingMaterial{" +
+                "texture1=" + texture1 +
+                ", texture2=" + texture2 +
                 '}';
     }
 
@@ -96,9 +90,12 @@ public class LambertMaterial extends Material {
             return false;
         }
 
-        LambertMaterial that = (LambertMaterial) o;
+        TextureChangingMaterial that = (TextureChangingMaterial) o;
 
-        if (texture != null ? !texture.equals(that.texture) : that.texture != null) {
+        if (texture1 != null ? !texture1.equals(that.texture1) : that.texture1 != null) {
+            return false;
+        }
+        if (texture2 != null ? !texture2.equals(that.texture2) : that.texture2 != null) {
             return false;
         }
 
@@ -107,6 +104,8 @@ public class LambertMaterial extends Material {
 
     @Override
     public int hashCode() {
-        return texture != null ? texture.hashCode() : 0;
+        int result = texture1 != null ? texture1.hashCode() : 0;
+        result = 31 * result + (texture2 != null ? texture2.hashCode() : 0);
+        return result;
     }
 }
