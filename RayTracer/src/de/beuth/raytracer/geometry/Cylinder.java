@@ -4,6 +4,7 @@
 
 package de.beuth.raytracer.geometry;
 
+import de.beuth.raytracer.color.Color;
 import de.beuth.raytracer.material.Material;
 import de.beuth.raytracer.mathlibrary.Point3;
 import de.beuth.raytracer.mathlibrary.Ray;
@@ -94,6 +95,26 @@ public class Cylinder extends Geometry {
         }
         return null;
 
+    }
+
+    /**
+     * converts any Material from a geometry into a singleColorMaterial
+     *
+     * @return new geometry with a singleColorMaterial
+     */
+    @Override
+    public Geometry convertToSingleColorMaterial() {
+        return new Cylinder(this.C, this.V, this.r, this.length, this.material.convertToSingelColorMaterial());
+    }
+
+    /**
+     * converts any Material from a geometry into a celShadingMaterial
+     *
+     * @return new geometry with a celShadingMaterial
+     */
+    @Override
+    public Geometry convertToCelShadingMaterial() {
+        return new Cylinder(this.C, this.V, this.r, this.length, this.material.convertToCelShadingMaterial());
     }
 
     /**

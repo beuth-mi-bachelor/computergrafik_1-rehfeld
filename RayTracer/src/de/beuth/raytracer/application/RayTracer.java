@@ -4,18 +4,24 @@
 package de.beuth.raytracer.application;
 
 import de.beuth.raytracer.camera.Camera;
+import de.beuth.raytracer.camera.OrthographicCamera;
+import de.beuth.raytracer.color.Color;
+import de.beuth.raytracer.geometry.Geometry;
+import de.beuth.raytracer.light.Light;
+import de.beuth.raytracer.mathlibrary.Point3;
+import de.beuth.raytracer.mathlibrary.Vector3;
 import de.beuth.raytracer.world.World;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 
-public class RayTracer extends JFrame implements ActionListener {
+public class RayTracer extends JFrame {
+
+    public static int OPEN_WINDOWS = 0;
 
     /**
      * static Width and Height declaration
@@ -26,101 +32,102 @@ public class RayTracer extends JFrame implements ActionListener {
     /**
      * The Frame inside containing the image
      */
-    private Draw imageContainer;
-
-    private JProgressBar pbar;
+    private ImageMaker imageContainer;
 
     public RayTracer(World world, Camera camera) {
+        this.doPreWindowOperations();
+        this.imageContainer = new ImageMaker(this, world, camera);
+        this.doPostWindowOperations();
+    }
 
+    public RayTracer() {
+        this.doPreWindowOperations();
+        final OrthographicCamera camera = new OrthographicCamera(new Point3(0, 0, 0), new Vector3(0, 0, 0), new Vector3(0, 0, 0), 0);
+        final World world = new World(new ArrayList<Geometry>(), new ArrayList<Light>(), new Color(0, 0, 0), 0);
+        this.imageContainer = new ImageMaker(this, world, camera);
+        this.doPostWindowOperations();
+    }
+
+    private void doPreWindowOperations() {
         /**
          * Set width and height of window
          */
         this.setSize(new Dimension(WIDTH, HEIGHT));
-        this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        this.centerWindow();
 
         /**
          * Creates the menü
          */
-        JMenuBar menu = new JMenuBar();
-        JMenu file = new JMenu("Datei");
-        JMenu options = new JMenu("Optionen");
-        JMenuItem saveItem = new JMenuItem("Speichern");
-        JMenuItem edgeDetection = new JMenuItem("Kantendetektion");
-        edgeDetection.addActionListener(this);
-        saveItem.addActionListener(this);
-        file.add (saveItem);
-        options.add (edgeDetection);
-        menu.add(file);
-        menu.add(options);
+        MenuBar menu = new MenuBar(this);
         this.setJMenuBar(menu);
+    }
 
-        /**
-         * Set window to visible
-         */
-
-        /**
-         * Creates a new Frame with the image painted inside
-         */
-        this.imageContainer = new Draw(world, camera, false);
+    private void doPostWindowOperations() {
         /**
          * Add this frame to the window
          */
         this.add(this.imageContainer);
-
+        this.addWindowListener(listener);
         this.setVisible(true);
 
     }
 
-    /**
-     * Handles the button in the menubar
-     * @param e which action is performed
-     */
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equals("Kantendetektion")) {
-            this.imageContainer.toggleEdgeDetection();
+    private WindowListener listener = new WindowListener() {
+        @Override
+        public void windowOpened(WindowEvent e) {
+            OPEN_WINDOWS++;
         }
-        /**
-         * If save is clicked
-         */
-        if (e.getActionCommand().equals("Speichern")) {
-            /**
-             * Show save dialog
-             */
-            JFileChooser fileDialog = new JFileChooser();
-            int choice = fileDialog.showSaveDialog(this);
-            /**
-             * If save option is chosen
-             */
-            if (choice == JFileChooser.APPROVE_OPTION) {
-                File saveFile = fileDialog.getSelectedFile();
-
-                /**
-                 * Store the filepath in a var
-                 */
-                String whatToSave = saveFile.getName().toLowerCase();
-
-                /**
-                 * if jpg set extension to jpg else to png
-                 * if there is no extension typed in, throw error
-                 */
-                if (whatToSave.endsWith(".jpg")) {
-                    whatToSave = "jpg";
-                } else if (whatToSave.endsWith(".png")) {
-                    whatToSave = "png";
-                } else {
-                    throw new IllegalArgumentException("Bitte Dateiendung .jpg oder .png angeben");
-                }
-
-                /**
-                 * try to save the image to location with chosen extension
-                 */
-                try {
-                    ImageIO.write(this.imageContainer.image, whatToSave, saveFile);
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
+        @Override
+        public void windowClosing(WindowEvent e) {
+            OPEN_WINDOWS--;
+            if (OPEN_WINDOWS == 0) {
+                System.exit(0);
             }
         }
+        @Override
+        public void windowClosed(WindowEvent e) {}
+        @Override
+        public void windowIconified(WindowEvent e) {}
+        @Override
+        public void windowDeiconified(WindowEvent e) {}
+        @Override
+        public void windowActivated(WindowEvent e) {}
+        @Override
+        public void windowDeactivated(WindowEvent e) {}
+    };
+
+    /**
+     * centers the window on screen
+     */
+    private void centerWindow() {
+        Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+        int X = (screen.width / 2) - (RayTracer.WIDTH / 2);
+        int Y = (screen.height / 2) - (RayTracer.HEIGHT / 2);
+        this.setBounds(X, Y, RayTracer.WIDTH, RayTracer.HEIGHT);
     }
+
+    public ImageMaker getImageContainer() {
+        return this.imageContainer;
+    }
+
+    public void toggleEdgeDetection() {
+        this.imageContainer.toggleEdgeDetection();
+    }
+
+    public void toggleCelShading() {
+        this.imageContainer.toggleCelShading();
+    }
+
+    public void toggleNormalImage() {
+        this.imageContainer.toggleNormalImage();
+    }
+
+    public void toggleNormalAndEdge() {
+        this.imageContainer.toggleNormalAndEdge();
+    }
+
+    public static void main(String[] args) {
+        new RayTracer();
+    }
+
 }

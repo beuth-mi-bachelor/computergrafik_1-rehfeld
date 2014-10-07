@@ -5,10 +5,7 @@
 package de.beuth.raytracer.geometry;
 
 import de.beuth.raytracer.material.Material;
-import de.beuth.raytracer.mathlibrary.Normal3;
-import de.beuth.raytracer.mathlibrary.Point3;
-import de.beuth.raytracer.mathlibrary.Ray;
-import de.beuth.raytracer.mathlibrary.Vector3;
+import de.beuth.raytracer.mathlibrary.*;
 
 /**
  * class represents a triangle
@@ -30,6 +27,10 @@ public class Triangle extends Geometry {
      */
     public final Point3 c;
 
+    public final Normal3 an;
+    public final Normal3 bn;
+    public final Normal3 cn;
+
     /**
      * creates a new triangle with the 3 Points
      * @param a one edge of triangle
@@ -37,11 +38,15 @@ public class Triangle extends Geometry {
      * @param c one edge of triangle
      * @param material material of the geometry
      */
-    public Triangle(final Point3 a, final Point3 b, final Point3 c, final Material material) {
+    public Triangle(final Point3 a, final Point3 b, final Point3 c, Normal3 an, Normal3 bn, Normal3 cn, final Material material) {
         super(material);
         this.a = a;
         this.b = b;
         this.c = c;
+        this.an = an;
+        this.bn = bn;
+        this.cn = cn;
+
     }
 
     /**
@@ -52,51 +57,46 @@ public class Triangle extends Geometry {
     @Override
     public Hit hit(final Ray r) {
 
-        Vector3 edge1 = this.b.sub(this.a);
-        Vector3 edge2 = this.c.sub(this.a);
-        Vector3 edge3 = this.b.sub(this.c);
+        Mat3x3 mat = new Mat3x3( a.x - b.x, a.x - c.x, r.d.x,
+                a.y - b.y, a.y - c.y, r.d.y,
+                a.z - b.z, a.z - c.z, r.d.z);
 
-        /**
-         * Find the cross product of edge2 and the ray direction
-         */
-        Vector3 s1 = r.d.x(edge2);
+        Vector3 vec = new Vector3(a.x - r.o.x, a.y - r.o.y, a.z - r.o.z);
 
-        /**
-         * Find the divisor, if its zero, return false as the triangle is degenerated
-         */
-        double divisor = s1.dot(edge1);
-        if (divisor == 0.0) {
+        double beta = mat.changeCol1(vec).determinant / mat.determinant;
+        double gamma = mat.changeCol2(vec).determinant / mat.determinant;
+        double t = mat.changeCol3(vec).determinant / mat.determinant;
+
+        if (beta < 0.0 || gamma < 0.0 || beta + gamma > 1.0 || t < Geometry.EPSILON) {
             return null;
         }
-
-        /**
-         * A inverted divisor, as multipling is faster then division
-         */
-        double invDivisor = 1 / divisor;
-
-        /**
-         * Calculate the first barycentic coordinate. Barycentic coordinates are between 0.0 and 1.0
-         */
-        Vector3 distance = r.o.sub(this.a);
-        double barycCoord_1 = distance.dot(s1) * invDivisor;
-        if (barycCoord_1 < 0.0 || barycCoord_1 > 1.0) {
-            return null;
+        else {
+            double alpha = 1 - beta - gamma;
+            Normal3 n = an.mul(alpha).add(bn.mul(alpha)).add(cn.mul(gamma));
+            return new Hit(t, r, this, n);
         }
 
-        /**
-         * Calculate the second barycentic coordinate.
-         */
-        Vector3 s2 = distance.x(edge1);
-        double barycCoord_2 = r.d.dot(s2) * invDivisor;
-        if (barycCoord_2 < 0.0 || (barycCoord_1 + barycCoord_2) > 1.0) {
-            return null;
-        }
 
-        double t = edge2.dot(s2) * invDivisor;
+    }
 
-        Normal3 n = edge1.x(edge2).normalized().asNormal();
+    /**
+     * converts any Material from a geometry into a singleColorMaterial
+     *
+     * @return new geometry with a singleColorMaterial
+     */
+    @Override
+    public Geometry convertToSingleColorMaterial() {
+        return new Triangle(this.a, this.b, this.c, this.an, this.bn, this.cn, this.material.convertToSingelColorMaterial());
+    }
 
-        return new Hit(t, r, this, n);
+    /**
+     * converts any Material from a geometry into a celShadingMaterial
+     *
+     * @return new geometry with a celShadingMaterial
+     */
+    @Override
+    public Geometry convertToCelShadingMaterial() {
+        return new Triangle(this.a, this.b, this.c, this.an, this.bn, this.cn, this.material.convertToCelShadingMaterial());
     }
 
     @Override

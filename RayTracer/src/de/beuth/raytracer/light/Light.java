@@ -7,6 +7,7 @@ package de.beuth.raytracer.light;
 import de.beuth.raytracer.color.Color;
 import de.beuth.raytracer.mathlibrary.Point3;
 import de.beuth.raytracer.mathlibrary.Vector3;
+import de.beuth.raytracer.world.World;
 
 /**
  * class to represent a light
@@ -17,21 +18,24 @@ public abstract class Light {
      * color of the light
      */
     public final Color color;
+    public final boolean castsShadows;
 
     /**
      * creates an instance of a light
      * @param color the color of the light
      */
-    public Light(final Color color) {
+    public Light(final Color color, final boolean castsShadows) {
         this.color = color;
+        this.castsShadows = castsShadows;
     }
 
     /**
      * this method proofs if the point is illuminated by the light
      * @param point the point to proof
+     * @param world to check if light is between object and world
      * @return true or false wheter it hits or not
      */
-    public abstract boolean illuminates(final Point3 point);
+    public abstract boolean illuminates(final Point3 point, final World world);
 
     /**
      * calculates the vector where the light comes from

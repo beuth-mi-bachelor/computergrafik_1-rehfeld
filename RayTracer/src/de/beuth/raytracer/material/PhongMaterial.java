@@ -46,19 +46,20 @@ public class PhongMaterial extends Material {
     }
 
     /**
-     * the method for calculating the color of the hit points
+     * this method returns the color for one Hit-Object
      * @param hit the hit with an object
      * @param world the world is needed to find the lights
-     * @return the color for a hitpoint
+     * @param tracer function for raytracing
+     * @return color for hit
      */
-    public Color colorFor(final Hit hit, final World world) {
+    public Color colorFor(final Hit hit, final World world, final Tracer tracer) {
 
         Normal3 hitNormal = hit.n;
         Color c = world.ambientLight.mul(this.diffuse);
         Point3 pointHit = hit.r.at(hit.t);
 
         for (Light light : world.ambientLights) {
-            if (light.illuminates(pointHit)) {
+            if (light.illuminates(pointHit, world)) {
                 Vector3 l = light.directionFrom(pointHit).normalized();
                 Vector3 r = l.reflectedOn(hit.n);
                 double max = Math.max(0.0, l.dot(hitNormal));
@@ -69,5 +70,25 @@ public class PhongMaterial extends Material {
             }
         }
         return c;
+    }
+
+    /**
+     * converts any Material into a CelShadingMaterial
+     *
+     * @return a new CelShadingMaterial
+     */
+    @Override
+    public CelShadingMaterial convertToCelShadingMaterial() {
+        return new CelShadingMaterial(this.diffuse);
+    }
+
+    /**
+     * converts any Material into a SingleColorMaterial
+     *
+     * @return a new SingleColorMaterial
+     */
+    @Override
+    public SingleColorMaterial convertToSingelColorMaterial() {
+        return new SingleColorMaterial(this.diffuse);
     }
 }

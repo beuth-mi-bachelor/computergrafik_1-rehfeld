@@ -44,25 +44,8 @@ public class EdgeDetection {
                         image.getRGB(i - 1, j + 1), image.getRGB(i, j + 1),
                         image.getRGB(i + 1, j + 1));
 
-                final double pixel_x = (ma1.m11 * newMatrix.m11)
-                        + (ma1.m12 * newMatrix.m12)
-                        + (ma1.m13 * newMatrix.m13)
-                        + (ma1.m21 * newMatrix.m21)
-                        + (ma1.m22 * newMatrix.m22)
-                        + (ma1.m23 * newMatrix.m23)
-                        + (ma1.m31 * newMatrix.m31)
-                        + (ma1.m32 * newMatrix.m32)
-                        + (ma1.m33 * newMatrix.m33);
-
-                final double pixel_y = (ma2.m11 * newMatrix.m11)
-                        + (ma2.m12 * newMatrix.m12)
-                        + (ma2.m13 * newMatrix.m13)
-                        + (ma2.m21 * newMatrix.m21)
-                        + (ma2.m22 * newMatrix.m22)
-                        + (ma2.m23 * newMatrix.m23)
-                        + (ma2.m31 * newMatrix.m31)
-                        + (ma2.m32 * newMatrix.m32)
-                        + (ma2.m33 * newMatrix.m33);
+                final double pixel_x = sobelFunction(ma1, newMatrix);
+                final double pixel_y = sobelFunction(ma2, newMatrix);
 
                 double val = Math.sqrt((pixel_x * pixel_x)
                         + (pixel_y * pixel_y));
@@ -72,9 +55,15 @@ public class EdgeDetection {
                 val = Math.max(0, val);
                 val = Math.min(val, 255);
 
-                final Color color = new Color((int) val);
+                final Color color = new Color((int) val, (int) val, (int) val);
 
                 edgeImage.setRGB(i, j, color.getRGB());
+                if (val == 0.0) {
+                    edgeImage.setRGB(i, j,new de.beuth.raytracer.color.Color(1, 1, 1).toRGB().getRGB());
+                }
+                else{
+                    edgeImage.setRGB(i, j,new de.beuth.raytracer.color.Color(0, 0, 0).toRGB().getRGB());
+                }
 
 
             }
@@ -83,6 +72,16 @@ public class EdgeDetection {
         return edgeImage;
     }
 
+    private double sobelFunction(Mat3x3 matrix1, Mat3x3 matrix2) {
+        return (matrix1.m11 * matrix2.m11)
+                + (matrix1.m12 * matrix2.m12)
+                + (matrix1.m13 * matrix2.m13)
+                + (matrix1.m21 * matrix2.m21)
+                + (matrix1.m22 * matrix2.m22)
+                + (matrix1.m23 * matrix2.m23)
+                + (matrix1.m31 * matrix2.m31)
+                + (matrix1.m32 * matrix2.m32)
+                + (matrix1.m33 * matrix2.m33);
+    }
 
-
-            }
+}

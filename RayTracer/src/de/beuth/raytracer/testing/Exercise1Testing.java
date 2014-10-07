@@ -11,6 +11,14 @@ import de.beuth.raytracer.mathlibrary.Vector3;
 
 public class Exercise1Testing {
 
+    public static void all() {
+        Exercise1Testing.main(new String[] {});
+    }
+
+    public static void runExample1() {
+        Exercise1Testing.main(new String[] {});
+    }
+
     /**
      * main method for testing the math library
      * @param args array of arguments passed to main-method

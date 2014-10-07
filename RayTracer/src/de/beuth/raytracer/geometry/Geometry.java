@@ -4,6 +4,7 @@
 
 package de.beuth.raytracer.geometry;
 
+import de.beuth.raytracer.color.Color;
 import de.beuth.raytracer.material.Material;
 import de.beuth.raytracer.mathlibrary.Ray;
 
@@ -18,6 +19,11 @@ public abstract class Geometry {
     public final Material material;
 
     /**
+     * threshold for the edge detection
+     */
+    public static final double EPSILON = 0.0001;
+
+    /**
      * creates an instance of geometry
      * @param material defines a base material
      */
@@ -25,7 +31,24 @@ public abstract class Geometry {
         this.material = material;
     }
 
+    /**
+     * calculates a hitpoint
+     * @param r ray which is used for calculating the hits
+     * @return a Hit object
+     */
     public abstract Hit hit(final Ray r);
+
+    /**
+     * converts any Material from a geometry into a singleColorMaterial
+     * @return new geometry with a singleColorMaterial
+     */
+    public abstract Geometry convertToSingleColorMaterial();
+
+    /**
+     * converts any Material from a geometry into a celShadingMaterial
+     * @return new geometry with a celShadingMaterial
+     */
+    public abstract Geometry convertToCelShadingMaterial();
 
     @Override
     public String toString() {

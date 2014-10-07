@@ -4,6 +4,7 @@
 
 package de.beuth.raytracer.geometry;
 
+import de.beuth.raytracer.color.Color;
 import de.beuth.raytracer.material.Material;
 import de.beuth.raytracer.mathlibrary.Normal3;
 import de.beuth.raytracer.mathlibrary.Point3;
@@ -46,13 +47,34 @@ public class Plane extends Geometry {
         double t2 = r.d.dot(n);
         if(t2 != 0.0) {
             double t = a.sub(r.o).dot(n) / t2;
-            if(t < 0) {
+            if (t < Geometry.EPSILON) {
                 return null;
             }
+
             return new Hit(t, r, this, n);
         }
 
         return null;
+    }
+
+    /**
+     * converts any Material from a geometry into a singleColorMaterial
+     *
+     * @return new geometry with a singleColorMaterial
+     */
+    @Override
+    public Geometry convertToSingleColorMaterial() {
+        return new Plane(this.a, this.n, this.material.convertToSingelColorMaterial());
+    }
+
+    /**
+     * converts any Material from a geometry into a celShadingMaterial
+     *
+     * @return new geometry with a celShadingMaterial
+     */
+    @Override
+    public Geometry convertToCelShadingMaterial() {
+        return new Plane(this.a, this.n, this.material.convertToCelShadingMaterial());
     }
 
     @Override

@@ -45,7 +45,7 @@ public class Exercise2Testing {
 
     //exercise 4
     public static final Material ex4_mat = new SingleColorMaterial(new Color(1, 0, 1));
-    public static final Triangle ex4_triangle = new Triangle(new Point3(-0.5, 0.5, -3), new Point3(0.5, 0.5, -3), new Point3(0.5, -0.5, -3), ex4_mat);
+    public static final Triangle ex4_triangle = new Triangle(new Point3(-0.5, 0.5, -3), new Point3(0.5, 0.5, -3), new Point3(0.5, -0.5, -3), new Normal3(0, 0, 1), new Normal3(0, 0, 1), new Normal3(0, 0, 1), ex4_mat);
     public static final PerspectiveCamera ex4_camera = new PerspectiveCamera(new Point3(0, 0, 0), new Vector3(0, 0, -1), new Vector3(0, 1, 0), (Math.PI / 4));
 
     // exercise 5
@@ -70,7 +70,7 @@ public class Exercise2Testing {
         geoList.add(Exercise2Testing.ex1_plane);
         ArrayList<Light> lights = new ArrayList<Light>();
         Color ambientLight = new Color(0, 0, 0);
-        World world = new World(geoList, lights, ambientLight);
+        World world = new World(geoList, lights, ambientLight, 0);
         new RayTracer(world, Exercise2Testing.ex1_camera);
     }
 
@@ -79,7 +79,7 @@ public class Exercise2Testing {
         geoList.add(Exercise2Testing.ex2_sphere);
         ArrayList<Light> lights = new ArrayList<Light>();
         Color ambientLight = new Color(0, 0, 0);
-        World world = new World(geoList, lights, ambientLight);
+        World world = new World(geoList, lights, ambientLight, 0);
         new RayTracer(world, Exercise2Testing.ex2_camera);
     }
 
@@ -88,7 +88,8 @@ public class Exercise2Testing {
         geoList.add(Exercise2Testing.ex3_box);
         ArrayList<Light> lights = new ArrayList<Light>();
         Color ambientLight = new Color(0, 0, 0);
-        World world = new World(geoList, lights, ambientLight);        new RayTracer(world, Exercise2Testing.ex3_camera);
+        World world = new World(geoList, lights, ambientLight, 0);
+        new RayTracer(world, Exercise2Testing.ex3_camera);
     }
 
     public static void runEx4() {
@@ -96,7 +97,8 @@ public class Exercise2Testing {
         geoList.add(Exercise2Testing.ex4_triangle);
         ArrayList<Light> lights = new ArrayList<Light>();
         Color ambientLight = new Color(0, 0, 0);
-        World world = new World(geoList, lights, ambientLight);        new RayTracer(world, Exercise2Testing.ex4_camera);
+        World world = new World(geoList, lights, ambientLight, 0);
+        new RayTracer(world, Exercise2Testing.ex4_camera);
     }
 
     public static void runEx5() {
@@ -105,7 +107,8 @@ public class Exercise2Testing {
         geoList.add(Exercise2Testing.ex5_sphere_2);
         ArrayList<Light> lights = new ArrayList<Light>();
         Color ambientLight = new Color(0, 0, 0);
-        World world = new World(geoList, lights, ambientLight);        new RayTracer(world, Exercise2Testing.ex5_camera);
+        World world = new World(geoList, lights, ambientLight, 0);
+        new RayTracer(world, Exercise2Testing.ex5_camera);
     }
 
     public static void runEx6() {
@@ -114,7 +117,8 @@ public class Exercise2Testing {
         geoList.add(Exercise2Testing.ex6_sphere_2);
         ArrayList<Light> lights = new ArrayList<Light>();
         Color ambientLight = new Color(0, 0, 0);
-        World world = new World(geoList, lights, ambientLight);        new RayTracer(world, Exercise2Testing.ex6_camera);
+        World world = new World(geoList, lights, ambientLight, 0);
+        new RayTracer(world, Exercise2Testing.ex6_camera);
     }
 
     public static void runEx7() {
@@ -122,7 +126,8 @@ public class Exercise2Testing {
         geoList.add(Exercise2Testing.ex7_cyl);
         ArrayList<Light> lights = new ArrayList<Light>();
         Color ambientLight = new Color(0, 0, 0);
-        World world = new World(geoList, lights, ambientLight);        new RayTracer(world, Exercise2Testing.ex7_camera);
+        World world = new World(geoList, lights, ambientLight, 0);
+        new RayTracer(world, Exercise2Testing.ex7_camera);
     }
 
     public static void main(String args[]) {
@@ -138,6 +143,10 @@ public class Exercise2Testing {
                 Exercise2Testing.runEx7();
             }
         });
+    }
+
+    public static void all() {
+        Exercise2Testing.main(new String[] {});
     }
 
 }

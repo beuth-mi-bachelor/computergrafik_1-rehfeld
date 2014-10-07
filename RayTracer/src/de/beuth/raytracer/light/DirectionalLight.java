@@ -5,8 +5,11 @@
 package de.beuth.raytracer.light;
 
 import de.beuth.raytracer.color.Color;
+import de.beuth.raytracer.geometry.Hit;
 import de.beuth.raytracer.mathlibrary.Point3;
+import de.beuth.raytracer.mathlibrary.Ray;
 import de.beuth.raytracer.mathlibrary.Vector3;
+import de.beuth.raytracer.world.World;
 
 
 /**
@@ -19,19 +22,38 @@ public class DirectionalLight extends Light {
      */
     public final Vector3 direction;
 
-    public DirectionalLight(final Color color, final Vector3 direction) {
-        super(color);
+    public DirectionalLight(final Color color, final Vector3 direction, final boolean castsShadows) {
+        super(color, castsShadows);
         this.direction = direction;
     }
 
     /**
      * this method proofs if the point is illuminated by the light
      * @param point the point to proof
+     * @param world to check if light is between object and world
      * @return true or false wheter it hits or not
+     * * @param castsShadows if element drops shadow
      */
     @Override
-    public boolean illuminates(final Point3 point) {
-        return true;
+    public boolean illuminates(final Point3 point, final World world) {
+        if (this.castsShadows) {
+            // create a new ray and let it hit the world
+            Ray r = new Ray(point, directionFrom(point));
+            Hit hit = world.hit(r);
+
+            // if there is no hit, world is illuminated, else there is a shadow
+            if (hit == null){
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        // if shadows are false, do nothing
+        else {
+            return true;
+        }
+
     }
 
     /**

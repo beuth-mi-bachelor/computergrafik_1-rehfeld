@@ -87,8 +87,4 @@ public class Ray {
                 '}';
     }
 
-    public static void main(String[] args) {
-
-    }
-
 }

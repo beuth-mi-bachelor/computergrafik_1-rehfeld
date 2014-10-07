@@ -5,8 +5,11 @@
 package de.beuth.raytracer.light;
 
 import de.beuth.raytracer.color.Color;
+import de.beuth.raytracer.geometry.Hit;
 import de.beuth.raytracer.mathlibrary.Point3;
+import de.beuth.raytracer.mathlibrary.Ray;
 import de.beuth.raytracer.mathlibrary.Vector3;
+import de.beuth.raytracer.world.World;
 
 /**
  * class represents a spotlight
@@ -34,9 +37,10 @@ public class SpotLight extends Light {
      * @param position position of the light
      * @param direction direction of the light
      * @param halfAngle open lense angle of the light
+     * @param castsShadows if element drops shadow
      */
-    public SpotLight(final Color color, final Point3 position, final Vector3 direction, final double halfAngle) {
-        super(color);
+    public SpotLight(final Color color, final Point3 position, final Vector3 direction, final double halfAngle, final boolean castsShadows) {
+        super(color, castsShadows);
         this.position = position;
         this.direction = direction;
         this.halfAngle = halfAngle;
@@ -44,17 +48,40 @@ public class SpotLight extends Light {
 
     /**
      * this method proofs if the point is illuminated by the light
-     *
      * @param point the point to proof
+     * @param world to check if light is between object and world
      * @return true or false wheter it hits or not
      */
     @Override
-    public boolean illuminates(final Point3 point) {
+    public boolean illuminates(final Point3 point, final World world) {
 
-        if(Math.sin(point.sub(position).normalized().x(direction).magnitude) <= halfAngle){
-            return true;
+        double t1 = (position.sub(point).magnitude) / (directionFrom(point).magnitude);
+
+        // create a ray and let it hit the world
+        Ray r = new Ray(point, directionFrom(point));
+        Hit hit = world.hit(r);
+
+        if (Math.asin(point.sub(position).normalized().x(direction).magnitude) <= halfAngle){
+            if (!castsShadows) {
+                return true;
+            }
+            if (hit != null) {
+                // if the hit is beyond the light
+                if (hit.t < t1) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+            // if they dont hit, there would be no shadow
+            else {
+                return true;
+            }
         }
-        return false;
+        // point is not in spotlight
+        else {
+            return false;
+        }
     }
 
     /**

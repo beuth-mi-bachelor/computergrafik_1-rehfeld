@@ -58,26 +58,46 @@ public class Sphere extends Geometry {
             double t1 = (-b + Math.sqrt(discriminant)) / (2 * a);
             double t2 = (-b - Math.sqrt(discriminant)) / (2 * a);
 
-            double t = Math.min(t1, t2);
+            double t = Geometry.EPSILON;
 
-            if(t1 < 0 && t2 < 0.0) {
-                return null;
+            if (t1 < Geometry.EPSILON && t2 < Geometry.EPSILON) {
+                t = Math.max(t1, t2);
             }
-            if(t1 < 0 && t2 >= 0) {
+            if (t1 > Geometry.EPSILON && t2 >= Geometry.EPSILON) {
+                t = Math.min(t1, t2);
+            }
+            if (t2 > Geometry.EPSILON && t1 < Geometry.EPSILON) {
                 t = t2;
             }
-            if(t < 0) {
-                return null;
+            if (t2 < Geometry.EPSILON && t1 > Geometry.EPSILON) {
+                t = t1;
             }
-
-            Normal3 n = r.at(t).sub(this.c).normalized().asNormal();
-
-            return new Hit (t, r, this, n);
+            if (t > Geometry.EPSILON) {
+                Normal3 n = r.at(t).sub(this.c).normalized().asNormal();
+                return new Hit(t, r, this, n);
+            }
         }
-        else {
             return null;
+    }
 
-        }
+    /**
+     * converts any Material from a geometry into a singleColorMaterial
+     *
+     * @return new geometry with a singleColorMaterial
+     */
+    @Override
+    public Geometry convertToSingleColorMaterial() {
+        return new Sphere(this.c, this.r, this.material.convertToSingelColorMaterial());
+    }
+
+    /**
+     * converts any Material from a geometry into a celShadingMaterial
+     *
+     * @return new geometry with a celShadingMaterial
+     */
+    @Override
+    public Geometry convertToCelShadingMaterial() {
+        return new Sphere(this.c, this.r, this.material.convertToCelShadingMaterial());
     }
 
     @Override

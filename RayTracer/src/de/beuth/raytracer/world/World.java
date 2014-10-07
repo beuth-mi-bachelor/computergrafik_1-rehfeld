@@ -23,6 +23,11 @@ public class World {
     public static final Color BACKGROUND_COLOR = new Color(0, 0, 0);
 
     /**
+     * refraction index
+     */
+    public int refractionIndex;
+
+    /**
      * list of geometries to be displayed
      */
     public final ArrayList<Geometry> geoList;
@@ -38,10 +43,11 @@ public class World {
      * creates a new instance of world
      * @param listOfGeometry ArrayList der Geometry
      */
-    public World(final ArrayList<Geometry> listOfGeometry, final ArrayList<Light> lights, Color ambientLight) {
+    public World(final ArrayList<Geometry> listOfGeometry, final ArrayList<Light> lights, Color ambientLight, final int refractionIndex) {
         this.geoList = listOfGeometry;
         this.ambientLights = lights;
         this.ambientLight = ambientLight;
+        this.refractionIndex = refractionIndex;
     }
 
     /**
@@ -63,8 +69,8 @@ public class World {
             if (h.t < minimalHit) {
                 minimalHit = h.t;
 
-                if (minimalHit < 0) {
-                    minimalHit = 0;
+                if (minimalHit < Geometry.EPSILON) {
+                    minimalHit = Geometry.EPSILON;
                 }
                 hit = h;
             }

@@ -4,10 +4,14 @@
 
 package de.beuth.raytracer.geometry;
 
+import de.beuth.raytracer.color.Color;
 import de.beuth.raytracer.material.Material;
+import de.beuth.raytracer.material.SingleColorMaterial;
 import de.beuth.raytracer.mathlibrary.Normal3;
 import de.beuth.raytracer.mathlibrary.Point3;
 import de.beuth.raytracer.mathlibrary.Ray;
+
+import java.util.ArrayList;
 
 /**
  * class represents a box
@@ -43,113 +47,86 @@ public class AxisAlignedBox extends Geometry {
      */
     @Override
     public Hit hit(final Ray r) {
-        final double ox = r.o.x;
-        final double oy = r.o.y;
-        final double oz = r.o.z;
-        final double dx = r.d.x;
-        final double dy = r.d.y;
-        final double dz = r.d.z;
-        final double tx_min;
-        final double ty_min;
-        final double tz_min;
-        final double tx_max;
-        final double ty_max;
-        final double tz_max;
-        final double a = 1.0 / dx;
-        final double b = 1.0 / dy;
-        final double c = 1.0 / dz;
 
-        double t0;
-        double t1;
+        // new planes as surfaces of box
+        final Plane left = new Plane(lbf, new Normal3(-1, 0, 0), new SingleColorMaterial(new Color(0, 0, 1)));
+        final Plane bottom = new Plane(lbf, new Normal3(0, -1, 0), new SingleColorMaterial(new Color(0, 1, 0)));
+        final Plane back = new Plane(lbf, new Normal3(0, 0, -1), new SingleColorMaterial(new Color(0, 0, 1)));
+        final Plane right = new Plane(run, new Normal3(1, 0, 0), new SingleColorMaterial(new Color(0, 1, 0)));
+        final Plane top = new Plane(run, new Normal3(0, 1, 0), new SingleColorMaterial(new Color(0, 0, 1)));
+        final Plane front = new Plane(run, new Normal3(0, 0, 1), new SingleColorMaterial(new Color(1, 0, 0)));
 
-        double tmin;
-
-        int front;
-        int back;
-
-        // from book: raytracing from ground up
-        if ((a) >= 0.0) {
-            tx_min = (lbf.x - ox) * (a);
-            tx_max = (run.x - ox) * (a);
-        } else {
-            tx_min = (run.x - ox) * (a);
-            tx_max = (lbf.x - ox) * (a);
+        // proof if planes are hit by ray
+        final ArrayList<Hit> hits = new ArrayList<Hit>();
+            if (left.hit(r) != null) {
+                hits.add(left.hit(r));
+            }
+        if (bottom.hit(r) != null) {
+            hits.add(bottom.hit(r));
         }
-        if ((b) >= 0.0) {
-            ty_min = (lbf.y - oy) * (b);
-            ty_max = (run.y - oy) * (b);
-        } else {
-            ty_min = (run.y - oy) * (b);
-            ty_max = (lbf.y - oy) * (b);
+        if (back.hit(r) != null) {
+            hits.add(back.hit(r));
         }
-        if ((c) >= 0.0) {
-            tz_min = (lbf.z - oz) * (c);
-            tz_max = (run.z - oz) * (c);
-        } else {
-            tz_min = (run.z - oz) * (c);
-            tz_max = (lbf.z - oz) * (c);
+        if (right.hit(r) != null) {
+            hits.add(right.hit(r));
+        }
+        if (top.hit(r) != null) {
+            hits.add(top.hit(r));
+        }
+        if (front.hit(r) != null) {
+            hits.add(front.hit(r));
         }
 
-        if (tx_min > ty_min) {
-            t0 = tx_min;
-            if (a >= 0.0) {
-                front = 0;
-            } else {
-                front = 3;
+        // proof which hits are in the box
+        final ArrayList<Hit> hitsInside = new ArrayList<Hit>();
+        for (final Hit h : hits) {
+            final double x = h.r.at(h.t).x;
+            final double y = h.r.at(h.t).y;
+            final double z = h.r.at(h.t).z;
+            final Normal3 normal = h.n;
+            if (h.geo.equals(left) || h.geo.equals(right)) {
+                if (lbf.y <= y && y <= run.y && lbf.z <= z && z <= run.z) {
+                    hitsInside.add(new Hit(h.t, r, this, normal));
+                }
             }
-        } else {
-            t0 = ty_min;
-            if (b >= 0.0) {
-                front = 1;
-            } else {
-                front = 4;
+            if (h.geo.equals(top) || h.geo.equals(bottom)) {
+                if (lbf.x <= x && x <= run.x && lbf.z <= z && z <= run.z) {
+                    hitsInside.add(new Hit(h.t, r, this, normal));
+                }
             }
-        }
-        if (tz_min > t0) {
-            t0 = tz_min;
-            if (c >= 0.0) {
-                front = 2;
-            } else {
-                front = 5;
-            }
-        }
-        if (tx_max < ty_max) {
-            t1 = tx_max;
-            if (a >= 0.0) {
-                back = 3;
-            } else {
-                back = 0;
-            }
-        } else {
-            t1 = ty_max;
-            if (b >= 0.0) {
-                back = 4;
-            } else {
-                back = 1;
+            if (h.geo.equals(front) || h.geo.equals(back)) {
+                if (lbf.x <= x && x <= run.x && lbf.y <= y && y <= run.y) {
+                    hitsInside.add(new Hit(h.t, r, this, normal));
+                }
             }
         }
-        if (tz_max < t1) {
-            t1 = tz_max;
-            if (c >= 0.0) {
-                back = 5;
-            } else {
-                back = 2;
+        Hit hit = null;
+        for (final Hit h : hitsInside) {
+            if (hit == null || h.t < hit.t) {
+                hit = h;
             }
         }
+        return hit;
+    }
 
-        if (t0 < t1 && t1 > 0) {
-            if (t0 > 0) {
-                tmin = t0;
-                Normal3 n = this.getNormalOfSite(front);
-                return new Hit(tmin, r, this, n);
-            } else {
-                tmin = t1;
-                Normal3 n = this.getNormalOfSite(front);
-                return new Hit(tmin, r, this, n);
-            }
-        } else {
-            return null;
-        }
+    /**
+     * converts any Material from a geometry into a singleColorMaterial
+     *
+     * @return new geometry with a singleColorMaterial
+     */
+    @Override
+    public Geometry convertToSingleColorMaterial() {
+        return new AxisAlignedBox(this.lbf, this.run, this.material.convertToSingelColorMaterial());
+    }
+
+    /**
+     * converts any Material from a geometry into a celShadingMaterial
+     *
+     * @return new geometry with a celShadingMaterial
+     */
+    @Override
+    public Geometry convertToCelShadingMaterial() {
+        return new AxisAlignedBox(this.lbf, this.run, this.material.convertToCelShadingMaterial());
     }
 
     private Normal3 getNormalOfSite(final int inBetween) {

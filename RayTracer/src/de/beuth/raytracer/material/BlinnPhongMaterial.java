@@ -44,13 +44,14 @@ public class BlinnPhongMaterial extends Material {
     }
 
     /**
-     * the method for calculating the color of the hit points
+     * this method returns the color for one Hit-Object
      * @param hit the hit with an object
      * @param world the world is needed to find the lights
-     * @return the color for the material
+     * @param tracer function for raytracing
+     * @return color for hit
      */
     @Override
-    public Color colorFor(final Hit hit, final World world) {
+    public Color colorFor(final Hit hit, final World world, final Tracer tracer) {
 
         Point3 point = hit.r.at(hit.t);
 
@@ -60,7 +61,7 @@ public class BlinnPhongMaterial extends Material {
 
             Color lightColor = World.BACKGROUND_COLOR;
 
-            if (light.illuminates(hit.r.at(hit.t))) {
+            if (light.illuminates(hit.r.at(hit.t), world)) {
 
                 final Vector3 lightVector = light.directionFrom(point).normalized();
 
@@ -81,4 +82,64 @@ public class BlinnPhongMaterial extends Material {
 
     }
 
+    /**
+     * converts any Material into a CelShadingMaterial
+     *
+     * @return a new CelShadingMaterial
+     */
+    @Override
+    public CelShadingMaterial convertToCelShadingMaterial() {
+        return new CelShadingMaterial(this.diffuse);
+    }
+
+    /**
+     * converts any Material into a SingleColorMaterial
+     *
+     * @return a new SingleColorMaterial
+     */
+    @Override
+    public SingleColorMaterial convertToSingelColorMaterial() {
+        return new SingleColorMaterial(this.diffuse);
+    }
+
+    @Override
+    public String toString() {
+        return "BlinnPhongMaterial{" +
+                "diffuse=" + diffuse +
+                ", specular=" + specular +
+                ", exponent=" + exponent +
+                '}';
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        BlinnPhongMaterial that = (BlinnPhongMaterial) o;
+
+        if (exponent != that.exponent) {
+            return false;
+        }
+        if (diffuse != null ? !diffuse.equals(that.diffuse) : that.diffuse != null) {
+            return false;
+        }
+        if (specular != null ? !specular.equals(that.specular) : that.specular != null) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = diffuse != null ? diffuse.hashCode() : 0;
+        result = 31 * result + (specular != null ? specular.hashCode() : 0);
+        result = 31 * result + exponent;
+        return result;
+    }
 }
